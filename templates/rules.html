@@ -1,0 +1,144 @@
+{% extends 'index.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+<div class="information">
+    <div>
+        <h2>Фильтр по части слова</h2>
+        {% if rules %}
+        <ul>
+            {% for rule in rules %}
+            <li>{{ rule }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No rules found</p>
+        {% endif %}
+    </div>
+
+    <form action="{{ url_for('add_rule') }}" method="post">
+        {{ add_rule_form.hidden_tag() }}
+        {% for field in add_rule_form if field.name not in ['csrf_token', 'submit'] -%}
+        {{ field.label() }}
+            {% if field.errors %}
+            {{ field(class="invalid") }}
+            <span class="invalid-feedback">
+		{% for e in field.errors %}
+		{{ e }}
+		{% endfor %}
+	</span>
+            {% else %}
+            {{ field() }}
+            {% endif %}
+            {% endfor %}
+    {{ add_rule_form.submit() }}
+    </form>
+    <form action="{{ url_for('remove_word') }}" method="post">
+        {{ delete_rule_form.hidden_tag() }}
+        {% for field in delete_rule_form if field.name not in ['csrf_token', 'submit'] -%}
+        {{ field.label() }}
+            {% if field.errors %}
+            {{ field(class="invalid") }}
+            <span class="invalid-feedback">
+		{% for e in field.errors %}
+		{{ e }}
+		{% endfor %}
+	</span>
+            {% else %}
+            {{ field() }}
+            {% endif %}
+            {% endfor %}
+    {{ delete_rule_form.submit() }}
+    </form>
+</div>
+
+<div class="information">
+    <div>
+        <h2>Слова исключения</h2>
+        {% if ban_rules %}
+        <ul>
+            {% for rule in ban_rules %}
+            <li>{{ rule }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No ban_rules found</p>
+        {% endif %}
+    </div>
+    <form action="{{ url_for('add_ban_rule') }}" method="post">
+        {{ add_ban_form.hidden_tag() }}
+        {% for field in add_ban_form if field.name not in ['csrf_token', 'submit'] -%}
+        {{ field.label() }}
+            {% if field.errors %}
+            {{ field(class="invalid") }}
+            <span class="invalid-feedback">
+		{% for e in field.errors %}
+		{{ e }}
+		{% endfor %}
+	</span>
+            {% else %}
+            {{ field() }}
+            {% endif %}
+            {% endfor %}
+    {{ add_ban_form.submit() }}
+    </form>
+    <form action="{{ url_for('remove_ban_word') }}" method="post">
+        {{ delete_ban_form.hidden_tag() }}
+        {% for field in delete_ban_form if field.name not in ['csrf_token', 'submit'] -%}
+        {{ field.label() }}
+            {% if field.errors %}
+            {{ field(class="invalid") }}
+            <span class="invalid-feedback">
+		{% for e in field.errors %}
+		{{ e }}
+		{% endfor %}
+	</span>
+            {% else %}
+            {{ field() }}
+            {% endif %}
+            {% endfor %}
+    {{ delete_ban_form.submit() }}
+    </form>
+</div>
+<div class="information">
+    <div>
+        <h2>Правила</h2>
+        {% if optional_rules %}
+        <div>
+            {% for rule in optional_rules %}
+            <p>Минимальная цена: {{ rule['priceFrom'] }} </p>
+            <p>Максимальная цена: {{ rule['priceTo'] }} </p>
+            <p>Окончание подачи заявок: {{ rule['date'] }} </p>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No rules found</p>
+        {% endif %}
+    </div>
+    <form action="{{ url_for('add_optional_rules') }}" method="post">
+        {{ add_optional_rules_form.hidden_tag() }}
+        {% for field in add_optional_rules_form if field.name not in ['csrf_token', 'submit'] -%}
+            {% if field.errors %}
+            {{ field(class="invalid") }}
+            <span class="invalid-feedback">
+		{% for e in field.errors %}
+		{{ e }}
+		{% endfor %}
+	</span>
+            {% else %}
+            {{ field() }}
+            {% endif %}
+            {% endfor %}
+    {{ add_optional_rules_form.submit() }}
+    </form>
+</div>
+
+</div>
+<form action="{{ url_for('find_tenders') }}" method="post">
+    <button class="custom-btn btn-10" type="submit" id='btn'>ПОИСК</button>
+</form>
+</div>
+{% endblock %}

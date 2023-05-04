@@ -1,0 +1,35 @@
+{% extends 'index.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+  <body>
+    {% if selected_items %}
+      {% for item in selected_items %}
+        <div>
+          <div class="information">
+            <a href="https://zakupki.gov.ru{{ item['href'] }}">
+              Номер: {{ item['id'] }}
+            </a>
+          <p>Описание: {{ item['title'] }}</p>
+          <p>Начальная цена: {{ item['price']|float_to_currency }}</p>
+          <p>Дата окончания подачи заявок: {{ item['date'] }}</p>
+          </div>
+          <div class="action">
+          <form action="/delete" method="post">
+            <input type="hidden" name="id" value="{{ item['id'] }}">
+            <button class="custom-btn btn-10" type="submit">Удалить</button>
+          </form>
+          <form action="/select" method="post">
+            <input type="hidden" name="id" value="{{ item['id'] }}">
+            <button  class="custom-btn btn-10" type="submit">Выбрать</button>
+          </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No items selected</p>
+    {% endif %}
+{% endblock %}
