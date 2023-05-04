@@ -255,11 +255,25 @@ def get_reasonability(rate):
     else:
         return "участие нецелесообразно"
 
-def sum_self_price(hr, instruments, materials):
+
+def get_self_price(hr, instruments, materials):
     try:
-        return hr + instruments + materials
+        return hr['costprice'] + instruments['costprice'] + materials['costprice']
+    except Exception as err:
+        print(err)
+
+
+def get_sppr_info(self_price, hr, instruments, materials, tender):
+    try:
+        if (self_price != 0 and hr['rate'] != 0 and instruments['rate'] != 0 and materials['rate'] != 0):
+            average_rate = (hr['rate'] + instruments['rate'] + materials['rate'])/3
+            reasonability = int((average_rate / 10) * (tender['price'] / (self_price + 1)) * 100)
+            support_decision = get_reasonability(reasonability)
+            return average_rate, str(reasonability) + '%', support_decision
+        else:
+            return 'Не все отделы выставили оценки!', 'Не все отделы выставили оценки!', 'Не все отделы выставили оценки!'
     except:
-        return "Не все оценки выставлены"
+        return 0,0,0
 @app.route('/tender/<role>/<id>')
 @login_required
 @department_permission.require(http_exception=403)
@@ -283,21 +297,14 @@ def tender(role, id):
         hr_info = dbase.get_tender_rate(id, 'hr')
         instruments_info = dbase.get_tender_rate(id, 'instruments')
         materials_info = dbase.get_tender_rate(id, 'materials')
-        # self_price = sum_self_price(hr_info['costprice'], instruments_info['costprice'], materials_info['costprice'])
-        self_price = (hr_info['costprice'] if hr_info['costprice'] is not None else 0) \
-                     + (instruments_info['costprice'] if instruments_info['costprice'] is not None else 0) \
-                     + (materials_info['costprice'] if materials_info['costprice'] is not None else 0)
-        average_rate = ((hr_info['rate'] if hr_info['rate'] is not None else 0)
-                        + (instruments_info['rate'] if instruments_info['rate'] is not None else 0) \
-                        + (materials_info['rate'] if materials_info['rate'] is not None else 0)) / 3
-        reasonability = (average_rate / 10) * (tender['price'] / (self_price + 1))
-        support_decision = get_reasonability(reasonability)
+        self_price = get_self_price(hr_info, instruments_info, materials_info)
+        average_rate, reasonability, support_decision = get_sppr_info(self_price, hr_info, instruments_info, materials_info, tender)
     else:
         rate_info = dbase.get_tender_rate(id, current_user.get_role())
     return render_template('tender.html', tender=tender,
                            self_price=self_price,
                            support_decision=support_decision,
-                           reasonability=int(reasonability * 100),
+                           reasonability=reasonability,
                            average_rate=average_rate,
                            rate_info=rate_info,
                            hr_info=hr_info,

@@ -86,7 +86,7 @@ class FDataBase:
             for role in roles:
                 if role['name'] != 'tender' and role['name'] != 'director':
                     self.__cur.execute(
-                        "INSERT INTO rating (rate, comment, costprice, role, tender) VALUES (NULL, NULL, NULL, ?, ?)",
+                        "INSERT INTO rating (rate, comment, costprice, role, tender) VALUES (0, NULL, 0, ?, ?)",
                         (role['id'], tender_id))
             self.__db.commit()
         except sqlite3.Error as e:

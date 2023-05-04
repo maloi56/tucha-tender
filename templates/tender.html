@@ -23,7 +23,7 @@
             <h3>СППР</h3>
             <p>Подсчитанная себестоимость: {{self_price}}</p>
             <p>Средняя оценка отделов: {{average_rate}}</p>
-            <p>Целесообразность участия: {{reasonability}}%</p>
+            <p>Целесообразность участия: {{reasonability}}</p>
             <h2>Решение СППР: {{support_decision}}</h2>
             <form action="/set_status" method="post">
                 <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
