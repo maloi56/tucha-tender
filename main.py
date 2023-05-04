@@ -73,7 +73,7 @@ instruments_permission = Permission(instruments_role)
 materials_permission = Permission(materials_role)
 director_permission = Permission(director_role)
 
-department_permission = Permission(hr_role, director_role, instruments_role, materials_permission)
+department_permission = Permission(hr_role, director_role, instruments_role, materials_role)
 
 # FLASK
 
@@ -255,12 +255,21 @@ def get_reasonability(rate):
     else:
         return "участие нецелесообразно"
 
-
+def sum_self_price(hr, instruments, materials):
+    try:
+        return hr + instruments + materials
+    except:
+        return "Не все оценки выставлены"
 @app.route('/tender/<role>/<id>')
 @login_required
+@department_permission.require(http_exception=403)
 def tender(role, id):
     tender = dbase.get_tender(id)
-    if not tender or role not in dbase.get_roles():
+    roles = dbase.get_roles()
+    dic = []
+    for row in roles:
+        dic.append(row['name'])
+    if not tender or role not in dic:
         abort(404)
     rate_info = []
     hr_info = []
@@ -274,6 +283,7 @@ def tender(role, id):
         hr_info = dbase.get_tender_rate(id, 'hr')
         instruments_info = dbase.get_tender_rate(id, 'instruments')
         materials_info = dbase.get_tender_rate(id, 'materials')
+        # self_price = sum_self_price(hr_info['costprice'], instruments_info['costprice'], materials_info['costprice'])
         self_price = (hr_info['costprice'] if hr_info['costprice'] is not None else 0) \
                      + (instruments_info['costprice'] if instruments_info['costprice'] is not None else 0) \
                      + (materials_info['costprice'] if materials_info['costprice'] is not None else 0)

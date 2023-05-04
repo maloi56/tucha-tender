@@ -73,19 +73,16 @@ class FDataBase:
 
     def get_roles(self):
         try:
-            self.__cur.execute('SELECT name FROM roles')
+            self.__cur.execute('SELECT * FROM roles')
             res = self.__cur.fetchall()
-            dic = []
-            for row in res:
-                dic.append(row['name'])
-            return dic
+            return res
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД " + str(e))
 
     def select_tender(self, tender_id):
         try:
-            self.__cur.execute('UPDATE selected SET status = "на рассмотрении" WHERE id = ?', tender_id)
-            roles = self.__get_roles()
+            self.__cur.execute('UPDATE selected SET status = "на рассмотрении" WHERE id = ?', (tender_id, ))
+            roles = self.get_roles()
             for role in roles:
                 if role['name'] != 'tender' and role['name'] != 'director':
                     self.__cur.execute(
@@ -234,7 +231,7 @@ class FDataBase:
     def rate_tender(self, role, tender_id, cost_price, comment, rate):
         try:
             self.__cur.execute("UPDATE rating SET rate = ?, comment = ?, costprice = ? WHERE tender = ? AND\
-             (SELECT id FROM roles WHERE name = ? LIMIT 1)",
+             rating.role = (SELECT id FROM roles WHERE name = ? LIMIT 1)",
                                (rate, comment, cost_price, tender_id, role))
             self.__db.commit()
         except sqlite3.Error as e:
