@@ -33,6 +33,7 @@ class FDataBase:
                 costprice INT,\
                 role INT NOT NULL,\
                 tender INT NOT NULL,\
+                document BLOB,\
                 FOREIGN KEY (role) REFERENCES roles (id),\
                 FOREIGN KEY (tender) REFERENCES selected (id))')
             self.__cur.execute(
@@ -86,7 +87,8 @@ class FDataBase:
             for role in roles:
                 if role['name'] != 'tender' and role['name'] != 'director':
                     self.__cur.execute(
-                        "INSERT INTO rating (rate, comment, costprice, role, tender) VALUES (0, NULL, 0, ?, ?)",
+                        "INSERT INTO rating (rate, comment, costprice, document, role, tender)\
+                         VALUES (0, NULL, 0, NULL, ?, ?)",
                         (role['id'], tender_id))
             self.__db.commit()
         except sqlite3.Error as e:
@@ -250,9 +252,32 @@ class FDataBase:
 
     def get_tender_rate(self, tender_id, role):
         try:
-            self.__cur.execute("SELECT rate, comment, costprice, tender FROM rating \
+            self.__cur.execute("SELECT * FROM rating \
             INNER JOIN roles on rating.role = roles.id \
             WHERE rating.tender = ? AND roles.name = ?", (tender_id, role))
+            res = self.__cur.fetchone()
+            if not res:
+                return False
+            return res
+        except sqlite3.Error as e:
+            print("Ошибка получения данных из БД " + str(e))
+        return False
+
+    def upload_doc(self, doc, role, tender_id):
+        try:
+            binary = sqlite3.Binary(doc)
+            self.__cur.execute("UPDATE rating SET document = ? WHERE tender = ? \
+             AND rating.role = (SELECT id from roles WHERE name = ?)", (binary, tender_id, role))
+            self.__db.commit()
+            return True
+        except sqlite3.Error as e:
+            print("Ошибка получения данных из БД " + str(e))
+        return False
+
+    def get_department_doc(self, tender_id, role):
+        try:
+            self.__cur.execute("SELECT document FROM rating WHERE tender = ? \
+             AND rating.role = (SELECT id from roles WHERE name = ?)", (tender_id, role))
             res = self.__cur.fetchone()
             if not res:
                 return False

@@ -5,55 +5,27 @@
 {% for cat, msg in get_flashed_messages(True) %}
 <div class="flash {{cat}}">{{msg}}</div>
 {% endfor %}
-<style>
-      .documents {
-        height: 88%;
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 15%;
-        border: 1px solid #ddd;
-        padding: 10px;
-        opacity: 0;
-        visibility: true;
-        transition: opacity 0.5s ease-in-out;
-      }
-
-      .documents:hover {
-        opacity: 1;
-        visibility: visible;
-      }
-
-</style>
 </head>
 <body>
 {% if selected_items %}
 {% for item in selected_items %}
 <div>
-    <div class="information">
-        <a href="https://zakupki.gov.ru{{ item['href'] }}">
-            Номер: {{ item['id'] }}
-        </a>
-        <p>Описание: {{ item['title'] }}</p>
-        <p>Начальная цена: {{ item['price']|float_to_currency }}</p>
-        <p>Дата окончания подачи заявок: {{ item['date'] }}</p>
-        <h2>Статус: {{ item['status'] }}</h2>
-        <!--          <form action="/select" method="post">-->
-        <!--            <input type="hidden" name="id" value="{{ item['id'] }}">-->
-        <!--            <button type="submit">Выбрать</button>-->
-        <!--          </form>-->
-        <div class="documents">
-            <a href="https://zakupki.gov.ru{{ item['href'] }}">
-                Номер: {{ item['id'] }}
-            </a>
+    <a href="{{ url_for('tender', role=current_user.get_role() , id=item.id) }}">
+        <style>
+          a:hover {
+            opacity: 0.8;
+          }
+
+
+        </style>
+        <div class="information">
+            <p> Номер: {{ item['id'] }} </p>
+            <p>Описание: {{ item['title'] }}</p>
+            <p>Начальная цена: {{ item['price']|float_to_currency }}</p>
+            <p>Дата окончания подачи заявок: {{ item['date'] }}</p>
+            <h2>Статус: {{ item['status'] }}</h2>
         </div>
-    </div>
-    <div class="action">
-        <form action="/downloadDocs" method="post">
-            <input type="hidden" name="id" value="{{ item['href'] }}">
-            <button class="custom-btn btn-10" type="submit">Скачать документы</button>
-        </form>
-    </div>
+    </a>
 </div>
 {% endfor %}
 {% else %}

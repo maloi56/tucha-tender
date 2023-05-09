@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 import time
 import re
 from flask import Flask, session, render_template, request, url_for, current_app, redirect, flash, send_file, g, \
-    url_for, abort
+    url_for, abort, make_response
 from flask_restful import Resource, Api
 import sqlite3
 from jinja2 import Environment, PackageLoader, select_autoescape
@@ -24,8 +24,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from UserLogin import UserLogin
 from FDataBase import FDataBase
-from flask_principal import Identity, Principal, Permission, RoleNeed, identity_loaded, identity_changed, AnonymousIdentity
-from forms import LoginForm, RegisterForm, AddFilterForm, DeleteFilterForm, AddBanForm, DeleteBanForm, AddOptionalRulesForm
+from flask_principal import Identity, Principal, Permission, RoleNeed, identity_loaded, identity_changed, \
+    AnonymousIdentity
+from forms import LoginForm, RegisterForm, AddFilterForm, DeleteFilterForm, AddBanForm, DeleteBanForm, \
+    AddOptionalRulesForm
+from io import BytesIO
 
 env = Environment(extensions=[do])
 
@@ -183,7 +186,8 @@ async def gather_data():
         filter = get_filter_words()
         stopWords = get_ban_words()
         for page in range(1, 10):
-            task = asyncio.create_task(get_page_data(session, page, stopWords, filter, priceFrom, priceTo, formatted_date))
+            task = asyncio.create_task(
+                get_page_data(session, page, stopWords, filter, priceFrom, priceTo, formatted_date))
             tasks.append(task)
 
         await asyncio.gather(*tasks)
@@ -201,6 +205,7 @@ def get_database():
         g.link_db = get_db()
     return g.link_db
 
+
 @app.route('/find_tenders', methods=['POST'])
 @login_required
 def find_tenders():
@@ -210,10 +215,11 @@ def find_tenders():
     return render_template('considered.html', title='Рассматриваемые заявки', selected_items=selected_items,
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
+
 @app.route('/')
 @login_required
 def index():
-    print(current_user.get_menu())
+    # dbase.init_db()
     return render_template('index.html', title="Интеллектуальная поддержка отбора заявок на сайте закупок",
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
@@ -266,41 +272,40 @@ def get_self_price(hr, instruments, materials):
 def get_sppr_info(self_price, hr, instruments, materials, tender):
     try:
         if (self_price != 0 and hr['rate'] != 0 and instruments['rate'] != 0 and materials['rate'] != 0):
-            average_rate = (hr['rate'] + instruments['rate'] + materials['rate'])/3
+            average_rate = (hr['rate'] + instruments['rate'] + materials['rate']) / 3
             reasonability = int((average_rate / 10) * (tender['price'] / (self_price + 1)) * 100)
             support_decision = get_reasonability(reasonability)
             return average_rate, str(reasonability) + '%', support_decision
         else:
             return 'Не все отделы выставили оценки!', 'Не все отделы выставили оценки!', 'Не все отделы выставили оценки!'
     except:
-        return 0,0,0
+        return 0, 0, 0
+
+
 @app.route('/tender/<role>/<id>')
 @login_required
-@department_permission.require(http_exception=403)
 def tender(role, id):
     tender = dbase.get_tender(id)
     roles = dbase.get_roles()
     dic = []
     for row in roles:
         dic.append(row['name'])
-    if not tender or role not in dic:
+    if not tender or role not in dic or role != current_user.get_role():
         abort(404)
     rate_info = []
-    hr_info = []
-    instruments_info = []
-    materials_info = []
+    hr_info = dbase.get_tender_rate(id, 'hr')
+    instruments_info = dbase.get_tender_rate(id, 'instruments')
+    materials_info = dbase.get_tender_rate(id, 'materials')
     self_price = 1
     average_rate = 1
     reasonability = 0
     support_decision = ""
     if current_user.get_role() == 'director':
-        hr_info = dbase.get_tender_rate(id, 'hr')
-        instruments_info = dbase.get_tender_rate(id, 'instruments')
-        materials_info = dbase.get_tender_rate(id, 'materials')
         self_price = get_self_price(hr_info, instruments_info, materials_info)
-        average_rate, reasonability, support_decision = get_sppr_info(self_price, hr_info, instruments_info, materials_info, tender)
+        average_rate, reasonability, support_decision = get_sppr_info(self_price, hr_info, instruments_info,
+                                                                      materials_info, tender)
     else:
-        rate_info = dbase.get_tender_rate(id, current_user.get_role())
+        rate_info = dbase.get_tender_rate(id, role)
     return render_template('tender.html', tender=tender,
                            self_price=self_price,
                            support_decision=support_decision,
@@ -469,7 +474,7 @@ def rules():
     return render_template('rules.html', title="База правил",
                            menu=current_user.get_menu() if current_user.is_authenticated else [],
                            rules=rules, add_rule_form=add_rule_form, delete_rule_form=delete_rule_form,
-                           ban_rules=ban_rules,add_ban_form=add_ban_form, delete_ban_form=delete_ban_form,
+                           ban_rules=ban_rules, add_ban_form=add_ban_form, delete_ban_form=delete_ban_form,
                            optional_rules=optional_rules, add_optional_rules_form=add_optional_rules_form)
 
 
@@ -578,6 +583,46 @@ def rate_tender():
     return render_template("tender.html", title=f"Тендерная заявка номер: {request.form['tender_id']}",
                            rate_info=rate_info, tender=tender,
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
+
+
+@app.route('/upload_doc', methods=['POST', 'GET'])
+def upload_doc():
+    if request.method == 'POST':
+        file = request.files['file'].read()
+        role = request.form['role']
+        tender_id = request.form['tender_id']
+        if len(file) > 0:
+            try:
+                res = dbase.upload_doc(file, role, tender_id)
+                if not res:
+                    flash("Ошибка обновления аватара", "error")
+                    return redirect(f'/tender/tender/{tender_id}')
+                flash("Файл загружен", "success")
+            except FileNotFoundError as e:
+                flash("Ошибка чтения файла", "error")
+            return redirect(f'/tender/tender/{tender_id}')
+        else:
+            flash("Ошибка чтения файла", "error")
+            return redirect(f'/tender/tender/{tender_id}')
+
+
+@app.route('/download_department_doc', methods=['POST', 'GET'])
+@login_required
+def download_department_doc():
+    if request.method == 'POST':
+        role = current_user.get_role()
+        tender_id = request.form['tender_id']
+        doc = dbase.get_department_doc(tender_id, role)['document']
+        if doc is not None:
+            mime = magic.Magic(mime=True)
+            content_type = mime.from_buffer(doc)
+            ext = mimetypes.guess_extension(content_type)
+            clean_text = role + "-" + tender_id
+            f_name = clean_text + ext if ext else clean_text + ".pdf"
+            return send_file(BytesIO(doc), download_name=f_name, as_attachment=True)
+        else:
+            flash("Не найдено документов", "error")
+            return redirect(f'/tender/{role}/{tender_id}')
 
 
 with app.app_context():
