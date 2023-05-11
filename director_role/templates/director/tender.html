@@ -1,0 +1,56 @@
+{% extends 'director/index.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<p>{{ msg }}</p>
+{% endfor %}
+<div class="information">
+    <p>{{ tender['title'] }} </p>
+    <p>Начальная цена: {{ tender['price']|float_to_currency }}</p>
+    <p>Дата окончания подачи заявок: {{ tender['date'] }}</p>
+</div>
+<div class="action">
+    <form action="{{ url_for('.downloadDocs') }}" method="post">
+        {{ doc_form.hidden_tag() }}
+        {{ doc_form.doc_href() }}
+        {{ doc_form.submit(class="custom-btn btn-10") }}
+    </form>
+</div>
+<div class="information">
+    <div class="information">
+        <div class='information'>
+            <h3>СППР</h3>
+            <p>Подсчитанная себестоимость: {{self_price}}</p>
+            <p>Средняя оценка отделов: {{average_rate}}</p>
+            <p>Целесообразность участия: {{reasonability}}</p>
+            <h2>Решение СППР: {{support_decision}}</h2>
+            <form action="{{ url_for('.set_status') }}" method="post">
+                <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
+                <div class='center'>
+                    {{ status_form.hidden_tag() }}
+                    {{ status_form.doc_href() }}
+                    {{ status_form.status(class="my-input") }}
+                    {{ status_form.submit(class="custom-btn btn-10") }}
+                </div>
+            </form>
+        </div>
+        <h3>Оценки отдела кадров</h3>
+        <p><strong>Оценочная себестоимость:</strong> {{ hr_info['costprice'] }} </p>
+        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ hr_info['rate'] }} </p>
+        <p><strong>Комментарий:</strong> {{ hr_info['comment'] }} </p>
+    </div>
+    <div class="information">
+        <h3>Оценки отдела складского учета</h3>
+        <p><strong>Оценочная себестоимость:</strong> {{ materials_info['costprice'] }} </p>
+        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ materials_info['rate'] }} </p>
+        <p><strong>Комментарий:</strong> {{ materials_info['comment'] }} </p>
+    </div>
+    <div class="information">
+        <h3>Оценки отдела инструментов и механизации</h3>
+        <p><strong>Оценочная себестоимость:</strong> {{ instruments_info['costprice'] }} </p>
+        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ instruments_info['rate'] }} </p>
+        <p><strong>Комментарий:</strong> {{ instruments_info['comment'] }} </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,12 +1,11 @@
 import requests
 from bs4 import BeautifulSoup
-import pymorphy2
+import pymorphy3
 from fuzzywuzzy import fuzz
 import time
 import re
 from flask import Flask, session, render_template, request, url_for, current_app, redirect, flash, send_file, g, \
-    url_for, abort, make_response
-from flask_restful import Resource, Api
+    url_for, abort, make_response, blueprints
 import sqlite3
 from jinja2 import Environment, PackageLoader, select_autoescape
 from jinja2.ext import do
@@ -26,12 +25,16 @@ from UserLogin import UserLogin
 from FDataBase import FDataBase
 from flask_principal import Identity, Principal, Permission, RoleNeed, identity_loaded, identity_changed, \
     AnonymousIdentity
+from dotenv import load_dotenv
 from forms import LoginForm, RegisterForm, AddFilterForm, DeleteFilterForm, AddBanForm, DeleteBanForm, \
     AddOptionalRulesForm
 from io import BytesIO
 
-env = Environment(extensions=[do])
+from director_role.director import director
+from hr_role.hr import hr
 
+env = Environment(extensions=[do])
+# load_dotenv()
 
 def float_to_currency(value):
     locale.setlocale(locale.LC_ALL, '')  # Устанавливаем локаль по умолчанию
@@ -42,7 +45,7 @@ def register_filters(app):
     app.jinja_env.filters['float_to_currency'] = float_to_currency
 
 
-morph = pymorphy2.MorphAnalyzer()
+morph = pymorphy3.MorphAnalyzer()
 data = {}
 res = {}
 date = ""
@@ -54,6 +57,11 @@ global_count = 0
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.config['SECRET_KEY'] = '7e05aef5e3609333d0ac992767e26bfcf88cdd87'
+
+
+
+app.register_blueprint(director, url_prefix='/director')
+app.register_blueprint(hr, url_prefix='/hr')
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -77,6 +85,7 @@ materials_permission = Permission(materials_role)
 director_permission = Permission(director_role)
 
 department_permission = Permission(hr_role, director_role, instruments_role, materials_role)
+
 
 # FLASK
 
@@ -481,7 +490,7 @@ def rules():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(f'/{current_user.get_role()}/')
     form = LoginForm()
     if form.validate_on_submit():
         user = dbase.getUserByLogin(form.login.data)
@@ -490,7 +499,7 @@ def login():
             identity_changed.send(current_app._get_current_object(), identity=Identity(user['id']))
             rm = form.remember.data
             login_user(userlogin, remember=rm)
-            return redirect(url_for('index'))
+            return redirect(f"/{dbase.get_role(user['role'])}/")
 
         flash("Неверная пара логин/пароль", "error")
 
@@ -552,11 +561,11 @@ def register():
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
 
-@app.route("/set_status", methods=["POST", "GET"])
-def set_status():
-    if request.method == "POST":
-        dbase.set_status(request.form['tender_id'], request.form['status'])
-    return redirect(url_for('other_selected'))
+# @app.route("/set_status", methods=["POST", "GET"])
+# def set_status():
+#     if request.method == "POST":
+#         dbase.set_status(request.form['tender_id'], request.form['status'])
+#     return redirect(url_for('other_selected'))
 
 
 @app.route("/rate_tender", methods=["POST", "GET"])
@@ -663,6 +672,12 @@ def close_db(error):
     '''Закрываем соединение с БД, если оно было установлено'''
     if hasattr(g, 'link_db'):
         g.link_db.close()
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    # do stuff
+    return redirect(url_for('login'))
 
 
 if __name__ == "__main__":

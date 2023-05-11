@@ -2,7 +2,8 @@
 <html>
   <head>
     <title>{{title}}</title>
-    <link rel="stylesheet" type="text/css" href="/static/selected.css">
+<!--    <link rel="stylesheet" type="text/css" href="../static/css/selected.css">-->
+    <link type="text/css" href="{{ url_for('.static', filename='css/selected.css')}}" rel="stylesheet" />
   </head>
   <body>
   <div class='mask'>
@@ -13,7 +14,7 @@
     <h1>{{title}}</h1>
     <div class="links">
     {% for p in menu %}
-      <a href="{{url_for(p.url)}}">{{p.title}}</a>
+      <a href="{{ url_for(p.url) }}">{{p.title}}</a>
     {% endfor %}
     </div>
   {% endblock mainmenu -%}

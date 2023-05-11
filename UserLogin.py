@@ -13,6 +13,7 @@ class UserLogin(UserMixin):
         return str(self.__user['id'])
 
     def get_role(self):
+        print('ya tut' + str(self.__user['role']))
         return str(self.__user['role'])
 
     def get_menu(self):
@@ -29,9 +30,6 @@ class UserLogin(UserMixin):
                     'url': '/logout'}
                    ]
         else:
-            return [{'title': 'Главная',
-                   'url': '/'},
-                    {'title': 'Отобранные',
-                   'url': '/other_selected'},
-                   {'title': 'Выход',
-                    'url': '/logout'}]
+            return [{'title': 'Главная', 'url': '.index'},
+                    {'title': 'Отобранные', 'url': '.other_selected'},
+                   {'title': 'Выход', 'url': 'logout'}]

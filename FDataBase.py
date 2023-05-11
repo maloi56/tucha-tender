@@ -85,7 +85,7 @@ class FDataBase:
             self.__cur.execute('UPDATE selected SET status = "на рассмотрении" WHERE id = ?', (tender_id, ))
             roles = self.get_roles()
             for role in roles:
-                if role['name'] != 'tender' and role['name'] != 'director':
+                if role['name'] != 'tender' and role['name'] != 'director_role':
                     self.__cur.execute(
                         "INSERT INTO rating (rate, comment, costprice, document, role, tender)\
                          VALUES (0, NULL, 0, NULL, ?, ?)",
@@ -198,7 +198,6 @@ class FDataBase:
             if not res:
                 print("Пользователь не найден")
                 return False
-
             return res
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД " + str(e))
@@ -214,6 +213,20 @@ class FDataBase:
                 return False
 
             return res
+        except sqlite3.Error as e:
+            print("Ошибка получения данных из БД " + str(e))
+
+        return False
+
+    def get_role(self, user_id):
+        try:
+            self.__cur.execute(f"SELECT name FROM roles WHERE id = ? LIMIT 1", (user_id, ))
+            res = self.__cur.fetchone()
+            if not res:
+                print("Пользователь не найден")
+                return False
+
+            return res['name']
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД " + str(e))
 
