@@ -6,9 +6,10 @@
 <p>{{ msg }}</p>
 {% endfor %}
 <div class="action">
-    <form action="/downloadDocs" method="post">
-        <input type="hidden" name="id" value="{{ tender['href'] }}">
-        <button class="custom-btn btn-10" type="submit">Скачать документы</button>
+    <form action="{{ url_for('.download_docs') }}" method="post">
+        {{ doc_form.hidden_tag() }}
+        {{ doc_form.doc_href() }}
+        {{ doc_form.submit(class="custom-btn btn-10") }}
     </form>
 </div>
 <div class="information">
@@ -21,10 +22,11 @@
     <p>Файл не загружен</p>
     {% endif %}
     <form action="{{ url_for('upload_doc') }}" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
-        <input type="hidden" name="role" value="hr">
-        <p><input type='file' name='file'></p>
-        <p><input type='submit' value="Загрузить"></p>
+        {{ upload_form.hidden_tag() }}
+        {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
+        {{ upload_form.role(value="hr", type="hidden") }}
+        <p>{{ upload_form.file()}}</p>
+        <p>{{ upload_form.submit() }}</p>
     </form>
 </div>
 <div class="information">
@@ -37,10 +39,11 @@
     <p>Файл не загружен</p>
     {% endif %}
     <form action="{{ url_for('upload_doc') }}" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
-        <input type="hidden" name="role" value="instruments">
-        <p><input type='file' name='file'></p>
-        <p><input type='submit' value="Загрузить"></p>
+        {{ upload_form.hidden_tag() }}
+        {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
+        {{ upload_form.role(value="instruments", type="hidden") }}
+        <p> {{ upload_form.file()}}</p>
+        <p>{{ upload_form.submit() }}</p>
     </form>
 </div>
 <div class="information">
@@ -52,11 +55,10 @@
     {% else %}
     <p>Файл не загружен</p>
     {% endif %}
-    <form action="{{ url_for('upload_doc') }}" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
-        <input type="hidden" name="role" value="materials">
-        <p><input type='file' name='file'></p>
-        <p><input type='submit' value="Загрузить"></p>
-    </form>
+    {{ upload_form.hidden_tag() }}
+    {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
+    {{ upload_form.role(value="materials", type="hidden") }}
+    <p>{{ upload_form.file()}}</p>
+    <p>{{ upload_form.submit() }}</p>
 </div>
 {% endblock %}

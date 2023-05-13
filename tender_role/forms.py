@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, PasswordField, \
-    SelectField, DateField, HiddenField, IntegerField, IntegerRangeField, TextAreaField
+    SelectField, DateField, HiddenField, IntegerField, IntegerRangeField, TextAreaField, FileField
 from wtforms.validators import DataRequired, Length, EqualTo, InputRequired, Regexp, NumberRange
 from wtforms.widgets import HiddenInput
 
@@ -32,12 +32,24 @@ class AddOptionalRulesForm(FlaskForm):
     submit = SubmitField("Обновить")
 
 
-class SelectTender(FlaskForm):
+class SelectTenderForm(FlaskForm):
     # tender_id = HiddenField(validators=[DataRequired()])
     tender_id = StringField(validators=[DataRequired()])
     submit = SubmitField("Выбрать")
 
 
-class DeleteTender(FlaskForm):
+class DeleteTenderForm(FlaskForm):
     tender_id = StringField(validators=[DataRequired()])
     submit = SubmitField("Удалить")
+
+
+class UploadDocForm(FlaskForm):
+    tender_id = StringField(validators=[DataRequired()])
+    role = StringField(validators=[DataRequired()])
+    file = FileField()
+    submit = SubmitField("Загрузить")
+
+
+class DownloadDocsForm(FlaskForm):
+    doc_href = HiddenField()
+    submit = SubmitField("Скачать документы")

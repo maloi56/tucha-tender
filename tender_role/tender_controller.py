@@ -1,13 +1,20 @@
 import sqlite3
+import shutil
+import magic
+import mimetypes
+import re
+import os
+import requests
+import tempfile
 from functools import wraps
 
-from flask import render_template, url_for, redirect, flash, g, abort, request
+from flask import render_template, url_for, redirect, flash, g, abort, request, send_file
 from flask_login import current_user
-
+from bs4 import BeautifulSoup
 from FDataBase import FDataBase
-# from tender_role import parser
+
 from tender_role.forms import AddFilterForm, DeleteFilterForm, AddBanForm, DeleteBanForm, AddOptionalRulesForm, \
-    SelectTender, DeleteTender
+    SelectTenderForm, DeleteTenderForm, UploadDocForm, DownloadDocsForm
 from tender_role.parser import find_new_tenders, get_filter_words, get_ban_words
 
 headers = {
@@ -68,8 +75,8 @@ def index():
 
 
 def considered():
-    select_form = SelectTender()
-    delete_form = DeleteTender()
+    select_form = SelectTenderForm()
+    delete_form = DeleteTenderForm()
     selected_items = dbase.get_considered('отбор')
     return render_template('tender/considered.html', title='Рассматриваемые заявки',
                            selected_items=selected_items,
@@ -79,7 +86,7 @@ def considered():
 
 
 def select():
-    select_form = SelectTender()
+    select_form = SelectTenderForm()
     if select_form.validate_on_submit():
         item_id = select_form.tender_id.data
         dbase.select_tender(item_id)
@@ -89,7 +96,7 @@ def select():
 
 
 def delete():
-    delete_form = DeleteTender()
+    delete_form = DeleteTenderForm()
     if delete_form.validate_on_submit():
         item_id = delete_form.tender_id.data
         dbase.delete_tender(item_id)
@@ -189,11 +196,16 @@ def tender_id(id):
     if not tender or not check_role():
         print(check_role())
         abort(404)
+    upload_form = UploadDocForm()
+    doc_form = DownloadDocsForm()
+    doc_form.doc_href.data = tender['id']
     hr_info = dbase.get_tender_rate(id, 'hr')
     instruments_info = dbase.get_tender_rate(id, 'instruments')
     materials_info = dbase.get_tender_rate(id, 'materials')
     return render_template('tender/tender.html',
                            tender=tender,
+                           doc_form=doc_form,
+                           upload_form=upload_form,
                            title=f"Тендерная заявка номер: {id}",
                            hr_info=hr_info,
                            instruments_info=instruments_info,
@@ -219,3 +231,50 @@ def upload_doc():
         else:
             flash("Ошибка чтения файла", "error")
             return redirect(f'/tender/tender/{tender_id}')
+
+
+def download_docs():
+    # Передавать список доступных документов и мб загрузку по одному отдельному
+    form = DownloadDocsForm()
+    id = form.doc_href.data
+    if id[0] == "0" and len(id) > 11:
+        url = f"https://zakupki.gov.ru/epz/order/notice/ea20/view/documents.html?regNumber={id}"
+        response = requests.get(url=url, headers=headers)
+        soup = BeautifulSoup(response.text, "lxml")
+        blocks = soup.find("div", class_="blockFilesTabDocs").find_all("span", {"class": "section__value"})
+        type = "44"
+    else:
+        url = f"https://zakupki.gov.ru/epz/order/notice/notice223/documents.html?noticeInfoId={id}"
+        response = requests.get(url=url, headers=headers)
+        soup = BeautifulSoup(response.text, "html.lxml")
+        pre_blocks = soup.find_all("div", class_="attachment__value")
+        blocks = pre_blocks[3].find_all("span", class_="count")
+        type = "223"
+        # print(blocks[1].find_all("span", {"class": "count "}))
+
+    # создаем временную папку для сохранения файлов
+    tempdir = tempfile.mkdtemp()
+
+    # скачиваем файлы и сохраняем их в временной папке
+    for block in blocks:
+        href = block.find_all("a")
+        url = href[0].get("href") if type == "44" else "https://zakupki.gov.ru" + href[1].get("href")
+        text = href[0].text if type == "44" else href[1].text
+        clean_text = re.sub(r'[^\w\s]', '', text).strip()
+
+        mime = magic.Magic(mime=True)
+
+        r = requests.get(url, headers=headers)
+        content_type = mime.from_buffer(r.content)
+        ext = mimetypes.guess_extension(content_type)
+        f_name = clean_text + ext if ext else clean_text + ".pdf"
+        filename = os.path.join(tempdir, f_name)
+        with open(filename, 'wb') as f:
+            f.write(r.content)
+
+    # создаем zip-архив с содержимым временной папки
+    zip_filename = f'Заявка - {id}.zip'
+    shutil.make_archive(zip_filename[:-4], 'zip', tempdir)
+
+    # отправляем zip-архив клиенту в качестве ответа на запрос
+    return send_file(zip_filename, as_attachment=True)

@@ -113,3 +113,8 @@ def tender_id(id):
 @controller.role_required
 def upload_doc():
     return controller.upload_doc()
+
+@tender.route('/download_docs', methods=['POST'])
+@controller.role_required
+def download_docs():
+    return controller.download_docs()

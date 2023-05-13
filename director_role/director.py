@@ -36,10 +36,10 @@ def set_status():
     return controller.set_status()
 
 
-@director.route('/downloadDocs', methods=['POST'])
+@director.route('/download_docs', methods=['POST'])
 @controller.role_required
-def downloadDocs():
-    return controller.downloadDocs()
+def download_docs():
+    return controller.download_docs()
 
 
 @director.route('/tender/<id>')

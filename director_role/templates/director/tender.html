@@ -11,7 +11,7 @@
     <p>Дата окончания подачи заявок: {{ tender['date'] }}</p>
 </div>
 <div class="action">
-    <form action="{{ url_for('.downloadDocs') }}" method="post">
+    <form action="{{ url_for('.download_docs') }}" method="post">
         {{ doc_form.hidden_tag() }}
         {{ doc_form.doc_href() }}
         {{ doc_form.submit(class="custom-btn btn-10") }}

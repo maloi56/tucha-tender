@@ -119,7 +119,7 @@ def index():
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
 
-def downloadDocs():
+def download_docs():
     # Передавать список доступных документов и мб загрузку по одному отдельному
     form = DirectorDocsForm()
     id = form.doc_href.data
