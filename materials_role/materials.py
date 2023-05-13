@@ -23,11 +23,11 @@ def index():
     return controller.index()
 
 
-@materials.route('/other_selected')
+@materials.route('/selected')
 @login_required
 @controller.role_required
-def other_selected():
-    return controller.other_selected()
+def selected():
+    return controller.selected()
 
 
 @materials.route('/tender/<id>')

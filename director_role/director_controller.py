@@ -99,14 +99,14 @@ def set_status():
     form = DirectorStatusForm()
     if form.validate_on_submit():
         dbase.set_status(request.form['tender_id'], form.status.data)
-    return redirect(url_for('.other_selected'))
+    return redirect(url_for('.selected'))
 
 
-def other_selected():
+def selected():
     if check_role():
         print(current_user.get_menu())
         selected_items = dbase.get_selected('отбор')
-        return render_template('director/other_selected.html', selected_items=selected_items, title="Выбранные заявки",
+        return render_template('director/selected.html', selected_items=selected_items, title="Выбранные заявки",
                                menu=current_user.get_menu() if current_user.is_authenticated else [])
     else:
         flash('Нет доступа')

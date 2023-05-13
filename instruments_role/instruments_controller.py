@@ -57,11 +57,11 @@ def close_db(request):
         g.link_db.close()
 
 
-def other_selected():
+def selected():
     if check_role():
         print(current_user.get_menu())
         selected_items = dbase.get_selected('отбор')
-        return render_template('instruments/other_selected.html', selected_items=selected_items, title="Выбранные заявки",
+        return render_template('instruments/selected.html', selected_items=selected_items, title="Выбранные заявки",
                                menu=current_user.get_menu() if current_user.is_authenticated else [])
     else:
         flash('Нет доступа')
@@ -109,7 +109,7 @@ def rate_tender():
         print(res)
         if res:
             flash("Оценка отправлена", "success")
-            return redirect(url_for('.other_selected'))
+            return redirect(url_for('.selected'))
         else:
             flash("Ошибка при добавлении в БД", "error")
 

@@ -261,7 +261,7 @@ def selected():
 @department_permission.require(http_exception=403)
 def other_selected():
     selected_items = dbase.get_selected('отбор')
-    return render_template('other_selected.html', selected_items=selected_items, title="Выбранные заявки",
+    return render_template('selected.html', selected_items=selected_items, title="Выбранные заявки",
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
 

@@ -25,5 +25,5 @@ class UserLogin(UserMixin):
                    ]
         else:
             return [{'title': 'Главная', 'url': '.index'},
-                    {'title': 'Отобранные', 'url': '.other_selected'},
+                    {'title': 'Отобранные', 'url': '.selected'},
                    {'title': 'Выход', 'url': 'logout'}]

@@ -23,11 +23,11 @@ def index():
     return controller.index()
 
 
-@director.route('/other_selected')
+@director.route('/selected')
 @login_required
 @controller.role_required
 def other_selected():
-    return controller.other_selected()
+    return controller.selected()
 
 
 @director.route("/set_status", methods=["POST"])
