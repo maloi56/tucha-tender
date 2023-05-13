@@ -13,21 +13,15 @@ class UserLogin(UserMixin):
         return str(self.__user['id'])
 
     def get_role(self):
-        print('ya tut' + str(self.__user['role']))
         return str(self.__user['role'])
 
     def get_menu(self):
         if self.get_role() == 'tender':
-           return [{'title': 'Главная',
-                   'url': '/'},
-                   {'title': 'Рассматриваемые',
-                    'url': '/considered'},
-                   {'title': 'Отобранные',
-                    'url': '/selected'},
-                   {'title': 'База правил',
-                    'url': '/rules'},
-                   {'title': 'Выход',
-                    'url': '/logout'}
+           return [{'title': 'Главная', 'url': '.index'},
+                   {'title': 'Рассматриваемые', 'url': '.considered'},
+                   {'title': 'Отобранные', 'url': '.selected'},
+                   {'title': 'База правил', 'url': '.rules'},
+                   {'title': 'Выход', 'url': 'logout'}
                    ]
         else:
             return [{'title': 'Главная', 'url': '.index'},

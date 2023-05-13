@@ -32,8 +32,13 @@ from io import BytesIO
 
 from director_role.director import director
 from hr_role.hr import hr
+from instruments_role.instruments import instruments
+from materials_role.materials import materials
+from tender_role.tender import tender
 
 env = Environment(extensions=[do])
+
+
 # load_dotenv()
 
 def float_to_currency(value):
@@ -58,10 +63,11 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.config['SECRET_KEY'] = '7e05aef5e3609333d0ac992767e26bfcf88cdd87'
 
-
-
 app.register_blueprint(director, url_prefix='/director')
 app.register_blueprint(hr, url_prefix='/hr')
+app.register_blueprint(instruments, url_prefix='/instruments')
+app.register_blueprint(materials, url_prefix='/materials')
+app.register_blueprint(tender, url_prefix='/tender')
 
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -85,7 +91,6 @@ materials_permission = Permission(materials_role)
 director_permission = Permission(director_role)
 
 department_permission = Permission(hr_role, director_role, instruments_role, materials_role)
-
 
 # FLASK
 
@@ -328,12 +333,12 @@ def tender(role, id):
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
 
-@app.route('/select', methods=['POST'])
-@login_required
-def select():
-    item_id = request.form['id']
-    dbase.select_tender(item_id)
-    return redirect(url_for('considered'))
+# @app.route('/select', methods=['POST'])
+# @login_required
+# def select():
+#     item_id = request.form['id']
+#     dbase.select_tender(item_id)
+#     return redirect(url_for('considered'))
 
 
 @app.route('/downloadDocs', methods=['POST'])

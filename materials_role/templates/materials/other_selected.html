@@ -1,0 +1,37 @@
+{% extends 'materials/index.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+<body>
+{% if selected_items %}
+{% for item in selected_items %}
+<div>
+    <a href="{{ url_for('.tender', id=item.id) }}">
+        <style>
+          a:hover {
+            opacity: 0.8;
+          }
+        </style>
+        <div class="information">
+            <p>Номер: {{ item['id'] }}</p>
+            <p>Описание: {{ item['title'] }}</p>
+            {% if item['status'] == "принято" %}
+            <h2 style="border: 1px solid #21DB56;
+	background: #AEFFC5;">Статус: {{ item['status'] }}</h2>
+            {% elif item['status'] == "отклонено" %}
+            <h2 style="border: 1px solid #FF4343;
+	background: #FF9C9C;">Статус: {{ item['status'] }}</h2>
+            {% else %}
+            <h2>Статус: {{ item['status'] }}</h2>
+            {% endif %}
+        </div>
+    </a>
+</div>
+{% endfor %}
+{% else %}
+<p>No items selected</p>
+{% endif %}
+{% endblock %}

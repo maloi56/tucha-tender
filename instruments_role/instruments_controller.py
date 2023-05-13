@@ -6,7 +6,7 @@ from io import BytesIO
 from flask import render_template, url_for, redirect, flash, g, abort, send_file, request
 from flask_login import current_user
 from FDataBase import FDataBase
-from hr_role.forms import RateTenderForm, DownloadDocsForm
+from instruments_role.forms import RateTenderForm, DownloadDocsForm
 
 headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
@@ -25,7 +25,7 @@ def role_required(route_func):
 
 
 def check_role():
-    return True if current_user.get_role() == 'hr' else False
+    return True if current_user.get_role() == 'instruments' else False
 
 
 def get_db():
@@ -61,7 +61,7 @@ def other_selected():
     if check_role():
         print(current_user.get_menu())
         selected_items = dbase.get_selected('отбор')
-        return render_template('hr/other_selected.html', selected_items=selected_items, title="Выбранные заявки",
+        return render_template('instruments/other_selected.html', selected_items=selected_items, title="Выбранные заявки",
                                menu=current_user.get_menu() if current_user.is_authenticated else [])
     else:
         flash('Нет доступа')
@@ -70,7 +70,7 @@ def other_selected():
 
 def index():
     # dbase.init_db()
-    return render_template('hr/index.html', title="Интеллектуальная поддержка отбора заявок на сайте закупок",
+    return render_template('instruments/index.html', title="Интеллектуальная поддержка отбора заявок на сайте закупок",
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
 
@@ -89,7 +89,7 @@ def tender(id):
     rate_form.slider.data = rate_info['rate']
     rate_form.comment.data = rate_info['comment']
 
-    return render_template('hr/tender.html',
+    return render_template('instruments/tender.html',
                            tender=tender,
                            download_form=download_form,
                            rate_form=rate_form,
@@ -114,7 +114,7 @@ def rate_tender():
             flash("Ошибка при добавлении в БД", "error")
 
     rate_info = dbase.get_tender_rate(tender['id'], role)
-    return render_template("hr/tender.html", title=f"Тендерная заявка номер: {tender['id']}",
+    return render_template("instruments/tender.html", title=f"Тендерная заявка номер: {tender['id']}",
                            rate_info=rate_info, tender=tender,
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 

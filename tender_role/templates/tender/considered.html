@@ -1,0 +1,37 @@
+{% extends 'tender/index.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<div class="flash {{cat}}">{{msg}}</div>
+{% endfor %}
+  <body>
+    {% if selected_items %}
+      {% for item in selected_items %}
+        <div>
+          <div class="information">
+            <a href="https://zakupki.gov.ru{{ item['href'] }}">
+              Номер: {{ item['id'] }}
+            </a>
+          <p>Описание: {{ item['title'] }}</p>
+          <p>Начальная цена: {{ item['price']|float_to_currency }}</p>
+          <p>Дата окончания подачи заявок: {{ item['date'] }}</p>
+          </div>
+          <div class="action">
+          <form action="{{url_for('.delete') }}" method="post">
+            {{ delete_form.hidden_tag() }}
+            {{ delete_form.tender_id(value=item['id'], type="hidden") }}
+            {{ delete_form.submit(class="custom-btn btn-10") }}
+          </form>
+          <form action="{{ url_for('.select') }}" method="post">
+            {{ select_form.hidden_tag() }}
+            {{ select_form.tender_id(value=item['id'], type="hidden")}}
+            {{ select_form.submit(class="custom-btn btn-10") }}
+          </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No items selected</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'tender/index.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<p>{{ msg }}</p>
+{% endfor %}
+<div class="action">
+    <form action="/downloadDocs" method="post">
+        <input type="hidden" name="id" value="{{ tender['href'] }}">
+        <button class="custom-btn btn-10" type="submit">Скачать документы</button>
+    </form>
+</div>
+<div class="information">
+    <h2>
+        Отправить документы отделу кадров
+    </h2>
+    {% if hr_info['document'] != None %}
+    <p>Файл загружен</p>
+    {% else %}
+    <p>Файл не загружен</p>
+    {% endif %}
+    <form action="{{ url_for('upload_doc') }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
+        <input type="hidden" name="role" value="hr">
+        <p><input type='file' name='file'></p>
+        <p><input type='submit' value="Загрузить"></p>
+    </form>
+</div>
+<div class="information">
+    <h2>
+        Отправить документы отделу инструментов
+    </h2>
+    {% if instruments_info['document'] != None %}
+    <p>Файл загружен</p>
+    {% else %}
+    <p>Файл не загружен</p>
+    {% endif %}
+    <form action="{{ url_for('upload_doc') }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
+        <input type="hidden" name="role" value="instruments">
+        <p><input type='file' name='file'></p>
+        <p><input type='submit' value="Загрузить"></p>
+    </form>
+</div>
+<div class="information">
+    <h2>
+        Отправить документы отделу материального учета
+    </h2>
+    {% if materials_info['document'] != None %}
+    <p>Файл загружен</p>
+    {% else %}
+    <p>Файл не загружен</p>
+    {% endif %}
+    <form action="{{ url_for('upload_doc') }}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
+        <input type="hidden" name="role" value="materials">
+        <p><input type='file' name='file'></p>
+        <p><input type='submit' value="Загрузить"></p>
+    </form>
+</div>
+{% endblock %}

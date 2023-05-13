@@ -94,6 +94,21 @@ class FDataBase:
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД " + str(e))
 
+
+    def delete_tender(self, tender_id):
+        try:
+            self.__cur.execute('UPDATE selected SET status = "Удалено" WHERE id = ?', (tender_id, ))
+            roles = self.get_roles()
+            for role in roles:
+                if role['name'] != 'tender' and role['name'] != 'director_role':
+                    self.__cur.execute(
+                        "INSERT INTO rating (rate, comment, costprice, document, role, tender)\
+                         VALUES (0, NULL, 0, NULL, ?, ?)",
+                        (role['id'], tender_id))
+            self.__db.commit()
+        except sqlite3.Error as e:
+            print("Ошибка получения данных из БД " + str(e))
+
     def get_filter_words(self):
         try:
             self.__cur.execute('SELECT * FROM filter_words')

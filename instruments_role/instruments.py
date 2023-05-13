@@ -1,50 +1,50 @@
 from flask import Blueprint
 from flask_login import login_required, current_user
 
-import hr_role.hr_controller as controller
+import instruments_role.instruments_controller as controller
 
-hr = Blueprint('hr', __name__, template_folder='templates', static_folder='static')
+instruments = Blueprint('instruments', __name__, template_folder='templates', static_folder='static')
 
 
-@hr.before_request
+@instruments.before_request
 def before_request():
     controller.before_request()
 
 
-@hr.teardown_request
+@instruments.teardown_request
 def close_db(request):
     controller.close_db(request)
 
 
-@hr.route('/')
+@instruments.route('/')
 @login_required
 @controller.role_required
 def index():
     return controller.index()
 
 
-@hr.route('/other_selected')
+@instruments.route('/other_selected')
 @login_required
 @controller.role_required
 def other_selected():
     return controller.other_selected()
 
 
-@hr.route('/tender/<id>')
+@instruments.route('/tender/<id>')
 @login_required
 @controller.role_required
 def tender(id):
     return controller.tender(id)
 
 
-@hr.route("/rate_tender", methods=["POST"])
+@instruments.route("/rate_tender", methods=["POST"])
 @login_required
 @controller.role_required
 def rate_tender():
     return controller.rate_tender()
 
 
-@hr.route('/download_department_doc', methods=['POST'])
+@instruments.route('/download_department_doc', methods=['POST'])
 @login_required
 @controller.role_required
 def download_department_doc():

@@ -1,0 +1,48 @@
+{% extends 'materials/index.html' %}
+
+{% block content %}
+{{ super() }}
+{% for cat, msg in get_flashed_messages(True) %}
+<p>{{ msg }}</p>
+{% endfor %}
+<div class="information">
+    <p>{{ tender['title'] }} </p>
+    <p>Начальная цена: {{ tender['price']|float_to_currency }}</p>
+    <p>Дата окончания подачи заявок: {{ tender['date'] }}</p>
+</div>
+<div class="action">
+    <form action="{{ url_for('.download_department_doc') }}" method="post">
+        {{ download_form.hidden_tag() }}
+        {{ download_form.tender_id() }}
+        {{ download_form.submit(class="custom-btn btn-10") }}
+    </form>
+</div>
+<div class="action">
+    <form action="{{ url_for('.rate_tender') }} " method="post">
+        <div class="information">
+            {{ rate_form.hidden_tag() }}
+            {{ rate_form.tender_id() }}
+            <p>{{ rate_form.costprice.label() }}</p>
+            <p>{{ rate_form.costprice(class='my-input')}}</p>
+            <div class="range-wrap">
+                <div class="range-slider">
+                    {{ rate_form.slider.label(class="label-range") }}
+                    {{ rate_form.slider(id="range1")}}
+                </div>
+            </div>
+            <p>{{ rate_form.comment.label(class="label-range") }}</p>
+            <p>{{ rate_form.comment(rows=20, cols=100, style="font-size: 20px")}}</p>
+            {{ rate_form.submit(class="custom-btn btn-10") }}
+            {% for field in rate_form if field.name not in ['csrf_token', 'submit', 'doc_href'] -%}
+            {% if field.errors %}
+            {{ field(class="invalid") }}
+            {% for e in field.errors %}
+            {{ e }}
+            {% endfor %}
+            {% endif %}
+            {% endfor %}
+        </div>
+    </form>
+</div>
+<script src="{{ url_for('.static', filename='js/slider.js')}}"></script>
+{% endblock %}

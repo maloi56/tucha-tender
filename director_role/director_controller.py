@@ -1,5 +1,6 @@
 import mimetypes
 import re
+from functools import wraps
 import sqlite3
 import tempfile
 import os
@@ -20,6 +21,16 @@ headers = {
 DATABASE = 'database.db'
 
 
+def role_required(route_func):
+    @wraps(route_func)
+    def wrapper(*args, **kwargs):
+        if request.endpoint.split('.')[0] != current_user.get_role():
+            abort(403)
+        return route_func(*args, **kwargs)
+
+    return wrapper
+
+
 def check_role():
     return True if current_user.get_role() == 'director' else False
 
@@ -36,7 +47,10 @@ def get_database():
         g.link_db = get_db()
     return g.link_db
 
+
 dbase = None
+
+
 def before_request():
     """Установление соединения с БД перед выполнением запроса"""
     global dbase
