@@ -157,6 +157,4 @@ def find_new_tenders(dbase):
         return True
     except Exception as e:
         print(e)
-        # todo Исправить баг
-        # todo Просмотреть каждый эндпоинт
         return False
