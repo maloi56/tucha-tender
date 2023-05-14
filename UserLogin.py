@@ -1,5 +1,6 @@
 from flask_login import UserMixin
 
+
 class UserLogin(UserMixin):
     def fromDB(self, user_id, db):
         self.__user = db.getUser(user_id)
@@ -17,13 +18,16 @@ class UserLogin(UserMixin):
 
     def get_menu(self):
         if self.get_role() == 'tender':
-           return [{'title': 'Главная', 'url': '.index'},
-                   {'title': 'Рассматриваемые', 'url': '.considered'},
-                   {'title': 'Отобранные', 'url': '.selected'},
-                   {'title': 'База правил', 'url': '.rules'},
-                   {'title': 'Выход', 'url': 'logout'}
-                   ]
+            return [{'title': 'Главная', 'url': '.index'},
+                    {'title': 'Рассматриваемые', 'url': '.considered'},
+                    {'title': 'Отобранные', 'url': '.selected'},
+                    {'title': 'База правил', 'url': '.rules'},
+                    {'title': 'Выход', 'url': 'auth.logout'}
+                    ]
+        elif self.get_role() == 'admin':
+            return [{'title': 'Выход', 'url': 'auth.logout'}]
+
         else:
             return [{'title': 'Главная', 'url': '.index'},
                     {'title': 'Отобранные', 'url': '.selected'},
-                   {'title': 'Выход', 'url': 'logout'}]
+                    {'title': 'Выход', 'url': 'auth.logout'}]

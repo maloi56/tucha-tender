@@ -151,10 +151,10 @@ class FDataBase:
                 return False
 
             tm = math.floor(time.time())
-            self.__cur.execute.execute("SELECT id from roles WHERE name = ?", (role,))
-            role_id = self.__cur.execute.fetchone()
+            self.__cur.execute("SELECT id from roles WHERE name = ?", (role,))
+            role_id = self.__cur.fetchone()
             print(role_id['id'])
-            self.__cur.execute.execute("INSERT INTO users (role, login, psw, time) VALUES(?, ?, ?, ?)",
+            self.__cur.execute("INSERT INTO users (role, login, psw, time) VALUES(?, ?, ?, ?)",
                         (role_id['id'], login, hpsw, tm))
             self.__db.commit()
         except sqlite3.Error as e:

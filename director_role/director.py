@@ -26,7 +26,7 @@ def index():
 @director.route('/selected')
 @login_required
 @controller.role_required
-def other_selected():
+def selected():
     return controller.selected()
 
 

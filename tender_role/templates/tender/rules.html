@@ -19,7 +19,7 @@
         {% endif %}
     </div>
 
-    <form action="{{ url_for('add_rule') }}" method="post">
+    <form action="{{ url_for('.add_rule') }}" method="post">
         {{ add_rule_form.hidden_tag() }}
         {% for field in add_rule_form if field.name not in ['csrf_token', 'submit'] -%}
         {{ field.label() }}
@@ -36,7 +36,7 @@
             {% endfor %}
     {{ add_rule_form.submit() }}
     </form>
-    <form action="{{ url_for('remove_word') }}" method="post">
+    <form action="{{ url_for('.remove_word') }}" method="post">
         {{ delete_rule_form.hidden_tag() }}
         {% for field in delete_rule_form if field.name not in ['csrf_token', 'submit'] -%}
         {{ field.label() }}
@@ -68,7 +68,7 @@
         <p>No ban_rules found</p>
         {% endif %}
     </div>
-    <form action="{{ url_for('add_ban_rule') }}" method="post">
+    <form action="{{ url_for('.add_ban_rule') }}" method="post">
         {{ add_ban_form.hidden_tag() }}
         {% for field in add_ban_form if field.name not in ['csrf_token', 'submit'] -%}
         {{ field.label() }}
@@ -85,7 +85,7 @@
             {% endfor %}
     {{ add_ban_form.submit() }}
     </form>
-    <form action="{{ url_for('remove_ban_word') }}" method="post">
+    <form action="{{ url_for('.remove_ban_word') }}" method="post">
         {{ delete_ban_form.hidden_tag() }}
         {% for field in delete_ban_form if field.name not in ['csrf_token', 'submit'] -%}
         {{ field.label() }}
@@ -118,7 +118,7 @@
         <p>No rules found</p>
         {% endif %}
     </div>
-    <form action="{{ url_for('add_optional_rules') }}" method="post">
+    <form action="{{ url_for('.add_optional_rules') }}" method="post">
         {{ add_optional_rules_form.hidden_tag() }}
         {% for field in add_optional_rules_form if field.name not in ['csrf_token', 'submit'] -%}
             {% if field.errors %}
@@ -137,7 +137,7 @@
 </div>
 
 </div>
-<form action="{{ url_for('find_tenders') }}" method="post">
+<form action="{{ url_for('.find_tenders') }}" method="post">
     <button class="custom-btn btn-10" type="submit" id='btn'>ПОИСК</button>
 </form>
 </div>

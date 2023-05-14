@@ -65,11 +65,11 @@ def close_db(request):
 
 
 def get_reasonability(rate):
-    if rate >= 1:
-        return "участие небходимо"
-    elif rate >= 0.8:
+    if rate >= 100:
+        return "участие необходимо"
+    elif rate >= 80:
         return "участие целесообразно"
-    elif rate >= 0.7:
+    elif rate >= 70:
         return "участие рисковано"
     else:
         return "участие нецелесообразно"
@@ -110,7 +110,7 @@ def selected():
                                menu=current_user.get_menu() if current_user.is_authenticated else [])
     else:
         flash('Нет доступа')
-        redirect(url_for("index"))
+        redirect(url_for(".index"))
 
 
 def index():

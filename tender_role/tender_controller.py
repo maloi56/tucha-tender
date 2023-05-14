@@ -140,7 +140,7 @@ def add_rule():
             flash('Новое правило было успешно добавлено!')
         else:
             flash('Ошибка при добавлении правила')
-        return redirect(url_for('rules'))
+        return redirect(url_for('.rules'))
 
 
 def add_optional_rules():
@@ -151,7 +151,7 @@ def add_optional_rules():
         flash('Новое правило было успешно добавлено!')
     else:
         flash('Ошибка при добавлении правила')
-    return redirect(url_for('rules'))
+    return redirect(url_for('.rules'))
 
 
 def remove_word():
@@ -160,7 +160,7 @@ def remove_word():
         flash('Слово "{}" было успешно удалено из правил!'.format(word))
     else:
         flash('Ошибка при удалении слова')
-    return redirect(url_for('rules'))
+    return redirect(url_for('.rules'))
 
 
 def add_ban_rule():
@@ -169,7 +169,7 @@ def add_ban_rule():
         flash('Новое правило было успешно добавлено!')
     else:
         flash('Ошибка при добавлении правила!')
-    return redirect(url_for('rules'))
+    return redirect(url_for('.rules'))
 
 
 def remove_ban_word():
@@ -182,7 +182,7 @@ def remove_ban_word():
 
 
 def find_tenders():
-    if find_new_tenders():
+    if find_new_tenders(dbase):
         selected_items = dbase.get_considered('отбор')
         return render_template('considered.html', title='Рассматриваемые заявки', selected_items=selected_items,
                                menu=current_user.get_menu() if current_user.is_authenticated else [])
@@ -199,7 +199,7 @@ def tender_id(id):
     upload_form = UploadDocForm()
     doc_form = DownloadDocsForm()
     doc_form.doc_href.data = tender['id']
-    hr_info = dbase.get_tender_rate(id, 'hr')
+    hr_info = dbase.get_tender_rate(id, 'login')
     instruments_info = dbase.get_tender_rate(id, 'instruments')
     materials_info = dbase.get_tender_rate(id, 'materials')
     return render_template('tender/tender.html',

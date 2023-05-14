@@ -3,7 +3,7 @@ from wtforms import StringField, SubmitField, BooleanField, PasswordField, Selec
 from wtforms.validators import DataRequired, Length, EqualTo
 
 class LoginForm(FlaskForm):
-    login = StringField("login: ", validators=[DataRequired()])
+    login = StringField("auth: ", validators=[DataRequired()])
     psw = PasswordField("Пароль: ", validators=[DataRequired(),
                                                 Length(min=4, max=100, message="Пароль должен быть от 4 до 100 символов")])
     remember = BooleanField("Запомнить", default = False)

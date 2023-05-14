@@ -66,7 +66,6 @@ def get_ban_words(dbase):
 
 
 async def get_page_data(session, page, stopWords, filter, priceFrom, priceTo, formatted_date):
-    global global_count
     url = f"https://zakupki.gov.ru/epz/order/extendedsearch/results.html?morphology=on&search-filter=%D0%94%D0%B0%D1%82%D0%B5+%D1%80%D0%B0%D0%B7%D0%BC%D0%B5%D1%89%D0%B5%D0%BD%D0%B8%D1%8F&pageNumber={page}&sortDirection=false&recordsPerPage=_50&showLotsInfoHidden=false&sortBy=UPDATE_DATE&fz44=on&fz223=on&ppRf615=on&af=on&priceFromGeneral={priceFrom}&priceToGeneral={priceTo}&currencyIdGeneral=-1&applSubmissionCloseDateTo={formatted_date}&customerPlace=5277327%2C5277335&customerPlaceCodes=50000000000%2C77000000000&OrderPlacementSmallBusinessSubject=on&OrderPlacementRnpData=on&OrderPlacementExecutionRequirement=on&orderPlacement94_0=0&orderPlacement94_1=0&orderPlacement94_2=0"
     async with session.get(url=url, headers=headers) as response:
         response_text = await response.text()
@@ -125,14 +124,12 @@ async def get_page_data(session, page, stopWords, filter, priceFrom, priceTo, fo
                 else:
                     print("В бан - " + card_data[0].text)
     print(f"[INFO] Обработал страницу {page}")
-    global_count += 1
-    print(global_count)
 
 
-async def gather_data():
+async def gather_data(db):
     async with aiohttp.ClientSession() as session:
         tasks = []
-        optRules = dbase.get_optional_rules()
+        optRules = db.get_optional_rules()
         if len(optRules) != 0:
             date = optRules[0]['date']
             date_obj = datetime.strptime(date, '%Y-%m-%d')
@@ -143,8 +140,8 @@ async def gather_data():
             formatted_date = str(datetime.today().strftime("%d-%m-%Y"))
             priceFrom = 0
             priceTo = 100000
-        filter = get_filter_words()
-        stopWords = get_ban_words()
+        filter = get_filter_words(db)
+        stopWords = get_ban_words(db)
         for page in range(1, 10):
             task = asyncio.create_task(
                 get_page_data(session, page, stopWords, filter, priceFrom, priceTo, formatted_date))
@@ -153,10 +150,13 @@ async def gather_data():
         await asyncio.gather(*tasks)
 
 
-def find_new_tenders():
+def find_new_tenders(dbase):
     try:
-        asyncio.run(gather_data())
+        asyncio.run(gather_data(dbase))
         dbase.insert_tenders(res)
         return True
     except Exception as e:
+        print(e)
+        # todo Исправить баг
+        # todo Просмотреть каждый эндпоинт
         return False

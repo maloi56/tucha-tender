@@ -21,7 +21,7 @@
     {% else %}
     <p>Файл не загружен</p>
     {% endif %}
-    <form action="{{ url_for('upload_doc') }}" method="post" enctype="multipart/form-data">
+    <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
         {{ upload_form.hidden_tag() }}
         {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
         {{ upload_form.role(value="hr", type="hidden") }}
@@ -38,7 +38,7 @@
     {% else %}
     <p>Файл не загружен</p>
     {% endif %}
-    <form action="{{ url_for('upload_doc') }}" method="post" enctype="multipart/form-data">
+    <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
         {{ upload_form.hidden_tag() }}
         {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
         {{ upload_form.role(value="instruments", type="hidden") }}
@@ -55,10 +55,12 @@
     {% else %}
     <p>Файл не загружен</p>
     {% endif %}
-    {{ upload_form.hidden_tag() }}
-    {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
-    {{ upload_form.role(value="materials", type="hidden") }}
-    <p>{{ upload_form.file()}}</p>
-    <p>{{ upload_form.submit() }}</p>
+    <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
+        {{ upload_form.hidden_tag() }}
+        {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
+        {{ upload_form.role(value="materials", type="hidden") }}
+        <p>{{ upload_form.file()}}</p>
+        <p>{{ upload_form.submit() }}</p>
+    </form>
 </div>
 {% endblock %}
