@@ -70,7 +70,7 @@ def get_reasonability(rate):
     elif rate >= 80:
         return "участие целесообразно"
     elif rate >= 70:
-        return "участие рисковано"
+        return "участие рискованно"
     else:
         return "участие нецелесообразно"
 

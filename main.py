@@ -1,11 +1,12 @@
 import locale
 import sqlite3
 import time
+import asyncio
 
 import pymorphy3
-from flask import Flask, redirect, g, \
-    url_for
+from flask import Flask, redirect, g, url_for
 from flask_login import LoginManager
+from flask_mail import Mail, Message
 from jinja2 import Environment
 from jinja2.ext import do
 
@@ -17,6 +18,7 @@ from hr_role.hr import hr
 from instruments_role.instruments import instruments
 from materials_role.materials import materials
 from tender_role.tender import tender
+from tender_role.parser import start_scheduler
 
 env = Environment(extensions=[do])
 
@@ -126,4 +128,5 @@ def page_not_found(e):
     return redirect(url_for('auth.login'))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    start_scheduler()
+    app.run(debug=True, use_reloader=False)

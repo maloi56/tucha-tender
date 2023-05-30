@@ -2,6 +2,7 @@ import sqlite3
 import time
 import math
 
+
 class FDataBase:
     def __init__(self, db):
         self.__db = db
@@ -64,6 +65,14 @@ class FDataBase:
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД " + str(e))
 
+    def get_considered_count(self, status):
+        try:
+            self.__cur.execute('SELECT COUNT(*) as `count` FROM selected WHERE status = ?', (status,))
+            res = self.__cur.fetchone()
+            return res['count']
+        except sqlite3.Error as e:
+            print("Ошибка получения данных из БД " + str(e))
+
     def get_selected(self, status):
         try:
             self.__cur.execute('SELECT * FROM selected WHERE status != ?', (status,))
@@ -82,7 +91,7 @@ class FDataBase:
 
     def select_tender(self, tender_id):
         try:
-            self.__cur.execute('UPDATE selected SET status = "на рассмотрении" WHERE id = ?', (tender_id, ))
+            self.__cur.execute('UPDATE selected SET status = "на рассмотрении" WHERE id = ?', (tender_id,))
             roles = self.get_roles()
             for role in roles:
                 if role['name'] != 'tender' and role['name'] != 'director_role':
@@ -94,10 +103,9 @@ class FDataBase:
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД " + str(e))
 
-
     def delete_tender(self, tender_id):
         try:
-            self.__cur.execute('UPDATE selected SET status = "Удалено" WHERE id = ?', (tender_id, ))
+            self.__cur.execute('UPDATE selected SET status = "Удалено" WHERE id = ?', (tender_id,))
             roles = self.get_roles()
             for role in roles:
                 if role['name'] != 'tender' and role['name'] != 'director_role':
@@ -155,7 +163,7 @@ class FDataBase:
             role_id = self.__cur.fetchone()
             print(role_id['id'])
             self.__cur.execute("INSERT INTO users (role, login, psw, time) VALUES(?, ?, ?, ?)",
-                        (role_id['id'], login, hpsw, tm))
+                               (role_id['id'], login, hpsw, tm))
             self.__db.commit()
         except sqlite3.Error as e:
             print("Ошибка получения данных из БД " + str(e))
@@ -169,7 +177,7 @@ class FDataBase:
                                    (priceFrom, priceTo, date))
             else:
                 self.__cur.execute('UPDATE rules set priceFrom = ?, priceTo = ?, date = ? WHERE id = 1',
-                            (priceFrom, priceTo, date))
+                                   (priceFrom, priceTo, date))
             self.__db.commit()
             return True
         except sqlite3.Error as e:
@@ -235,7 +243,7 @@ class FDataBase:
 
     def get_role(self, user_id):
         try:
-            self.__cur.execute(f"SELECT name FROM roles WHERE id = ? LIMIT 1", (user_id, ))
+            self.__cur.execute(f"SELECT name FROM roles WHERE id = ? LIMIT 1", (user_id,))
             res = self.__cur.fetchone()
             if not res:
                 print("Пользователь не найден")

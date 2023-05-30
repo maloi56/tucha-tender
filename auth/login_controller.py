@@ -44,6 +44,7 @@ def close_db(request):
     if hasattr(g, 'link_db'):
         g.link_db.close()
 
+
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -58,12 +59,13 @@ def register():
     return render_template("auth/register.html", title="Регистрация", form=form,
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
+
 def login():
     if current_user.is_authenticated:
         if current_user.get_role() == 'admin':
             return redirect(url_for(".register"))
         else:
-            return redirect(url_for('.index'))
+            return redirect(f"/{current_user.get_role()}/")
     form = LoginForm()
     if form.validate_on_submit():
         user = dbase.getUserByLogin(form.login.data)
@@ -91,4 +93,3 @@ def logout():
 
     # Tell Flask-Principal the user is anonymous
     return redirect(url_for(".login"))
-

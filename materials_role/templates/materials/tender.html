@@ -32,7 +32,11 @@
             </div>
             <p>{{ rate_form.comment.label(class="label-range") }}</p>
             <p>{{ rate_form.comment(rows=20, cols=100, style="font-size: 20px")}}</p>
-            {{ rate_form.submit(class="custom-btn btn-10") }}
+            {% if tender['status'] == "на рассмотрении"%}
+            <p>{{ rate_form.submit(class="custom-btn btn-10") }}</p>
+            {% else %}
+            <p>{{ rate_form.submit(class="custom-btn btn-10", disabled = True) }}</p>
+            {% endif %}
             {% for field in rate_form if field.name not in ['csrf_token', 'submit', 'doc_href'] -%}
             {% if field.errors %}
             {{ field(class="invalid") }}

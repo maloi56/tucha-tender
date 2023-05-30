@@ -8,6 +8,8 @@ import pymorphy3
 from fuzzywuzzy import fuzz
 from flask import g
 from FDataBase import FDataBase
+from apscheduler.schedulers.background import BackgroundScheduler
+from util.mail_sender import Mail
 
 morph = pymorphy3.MorphAnalyzer()
 
@@ -34,6 +36,10 @@ def get_database():
     if not hasattr(g, 'link_db'):
         g.link_db = get_db()
     return g.link_db
+
+
+def create_temp_bd():  # Delete soon
+    return FDataBase(get_db())
 
 
 def before_request():
@@ -152,9 +158,24 @@ async def gather_data(db):
 
 def find_new_tenders(dbase):
     try:
+        mail = Mail('tendertestingg@gmail.com', 'uhtvsfqnhylrmclc')
+        current_tenders_count = int(dbase.get_considered_count('отбор'))
         asyncio.run(gather_data(dbase))
         dbase.insert_tenders(res)
+        tenders_count = len(res) - current_tenders_count
+        if tenders_count != 0 and scheduler.running:
+            msg = f'Найдено {tenders_count} новых заявок'
+            mail.send_email("Поиск тендеров", 'beztfake@yandex.ru', msg)
         return True
     except Exception as e:
         print(e)
         return False
+
+
+temp_db = create_temp_bd()
+scheduler = BackgroundScheduler()
+scheduler.add_job(find_new_tenders, 'interval', hours=24, args=[temp_db])  # Запуск каждые 24 часа
+
+
+def start_scheduler():
+    scheduler.start()

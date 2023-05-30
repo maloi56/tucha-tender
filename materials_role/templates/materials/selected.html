@@ -7,7 +7,7 @@
 {% endfor %}
 <body>
 {% if selected_items %}
-{% for item in selected_items %}
+{% for item in selected_items if item['status'] != "Удалено" %}
 <div>
     <a href="{{ url_for('.tender', id=item.id) }}">
         <style>
