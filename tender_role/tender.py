@@ -6,16 +6,6 @@ import tender_role.tender_controller as controller
 tender = Blueprint('tender', __name__, template_folder='templates', static_folder='static')
 
 
-@tender.before_request
-def before_request():
-    controller.before_request()
-
-
-@tender.teardown_request
-def close_db(request):
-    controller.close_db(request)
-
-
 @tender.route('/')
 @login_required
 @controller.role_required
@@ -113,6 +103,7 @@ def tender_id(id):
 @controller.role_required
 def upload_doc():
     return controller.upload_doc()
+
 
 @tender.route('/download_docs', methods=['POST'])
 @controller.role_required

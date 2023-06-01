@@ -1,15 +1,15 @@
 import re
 import asyncio
 import aiohttp
-import sqlite3
+import dbase
 from datetime import datetime
 from bs4 import BeautifulSoup
 import pymorphy3
 from fuzzywuzzy import fuzz
-from flask import g
-from FDataBase import FDataBase
-from apscheduler.schedulers.background import BackgroundScheduler
+# from apscheduler.schedulers.background import BackgroundScheduler
+from flask_apscheduler import APScheduler
 from util.mail_sender import Mail
+from flask import current_app
 
 morph = pymorphy3.MorphAnalyzer()
 
@@ -18,56 +18,24 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
 }
 
-DATABASE = 'database.db'
-dbase = None
 baseStopWords = ["а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т",
                  "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", "э", "ю", "я", "ст"]
 res = {}
 
 
-def get_db():
-    db = sqlite3.connect(DATABASE, check_same_thread=False)
-    db.row_factory = sqlite3.Row
-    return db
-
-
-def get_database():
-    '''Соединение с БД, если оно еще не установлено'''
-    if not hasattr(g, 'link_db'):
-        g.link_db = get_db()
-    return g.link_db
-
-
-def create_temp_bd():  # Delete soon
-    return FDataBase(get_db())
-
-
-def before_request():
-    """Установление соединения с БД перед выполнением запроса"""
-    global dbase
-    db = get_database()
-    dbase = FDataBase(db)
-
-
-def close_db(request):
-    '''Закрываем соединение с БД, если оно было установлено'''
-    if hasattr(g, 'link_db'):
-        g.link_db.close()
-
-
-def get_filter_words(dbase):
+def get_filter_words():
     rules = dbase.get_filter_words()
     words = []
     for rule in rules:
-        words += rule['word'].split()
+        words += rule.word.split()
     return set(words)
 
 
-def get_ban_words(dbase):
+def get_ban_words():
     rules = dbase.get_ban_words()
     words = []
     for rule in rules:
-        words += rule['word'].split()
+        words += rule.word.split()
     return set(words)
 
 
@@ -118,7 +86,7 @@ async def get_page_data(session, page, stopWords, filter, priceFrom, priceTo, fo
                                         "id": id,
                                         "title": card_data[0].text,
                                         "price": price_value,
-                                        "date": date_value,
+                                        "date": datetime.strptime(date_value, '%d.%m.%Y'),
                                         "href": href[2].get("href")
                                     }
                                     print(fil_word + " " + word)
@@ -137,17 +105,16 @@ async def gather_data(db):
         tasks = []
         optRules = db.get_optional_rules()
         if len(optRules) != 0:
-            date = optRules[0]['date']
-            date_obj = datetime.strptime(date, '%Y-%m-%d')
-            formatted_date = date_obj.strftime('%d.%m.%Y')
-            priceFrom = optRules[0]['priceFrom']
-            priceTo = optRules[0]['priceTo']
+            date = optRules[0].date
+            formatted_date = date.strftime('%d.%m.%Y')
+            priceFrom = optRules[0].priceFrom
+            priceTo = optRules[0].priceTo
         else:
             formatted_date = str(datetime.today().strftime("%d-%m-%Y"))
             priceFrom = 0
             priceTo = 100000
-        filter = get_filter_words(db)
-        stopWords = get_ban_words(db)
+        filter = get_filter_words()
+        stopWords = get_ban_words()
         for page in range(1, 10):
             task = asyncio.create_task(
                 get_page_data(session, page, stopWords, filter, priceFrom, priceTo, formatted_date))
@@ -156,9 +123,9 @@ async def gather_data(db):
         await asyncio.gather(*tasks)
 
 
-def find_new_tenders(dbase):
+def find_new_tenders():  # надо будет подумать над логикой подсчета новых заявок. можно, чтобы функция инсерта возвращала кол-во
     try:
-        mail = Mail('tendertestingg@gmail.com', 'uhtvsfqnhylrmclc')
+        mail = Mail('tendertestingg@gmail.com', 'kusvcxkhioiffbgi')
         current_tenders_count = int(dbase.get_considered_count('отбор'))
         asyncio.run(gather_data(dbase))
         dbase.insert_tenders(res)
@@ -172,10 +139,16 @@ def find_new_tenders(dbase):
         return False
 
 
-temp_db = create_temp_bd()
-scheduler = BackgroundScheduler()
-scheduler.add_job(find_new_tenders, 'interval', hours=24, args=[temp_db])  # Запуск каждые 24 часа
+scheduler = APScheduler()
+
+
+# scheduler.add_job(find_new_tenders, 'interval', minutes=1)  # Запуск каждые 24 часа
 
 
 def start_scheduler():
+    @scheduler.task('interval', id='do_job_1', seconds=30, misfire_grace_time=900)
+    def job1():
+        with scheduler.app.app_context():
+            find_new_tenders()
+
     scheduler.start()

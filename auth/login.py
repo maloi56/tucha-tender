@@ -5,16 +5,6 @@ import auth.login_controller as controller
 auth = Blueprint('auth', __name__, template_folder='templates', static_folder='static')
 
 
-@auth.before_request
-def before_request():
-    controller.before_request()
-
-
-@auth.teardown_request
-def close_db(request):
-    controller.close_db(request)
-
-
 @auth.route("/register", methods=["POST", "GET"])
 @login_required
 def register():
@@ -33,4 +23,3 @@ def login():
 @login_required
 def logout():
     return controller.logout()
-

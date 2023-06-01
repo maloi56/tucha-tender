@@ -24,7 +24,7 @@ DATABASE = 'database.db'
 def role_required(route_func):
     @wraps(route_func)
     def wrapper(*args, **kwargs):
-        if request.endpoint.split('.')[0] != current_user.get_role():
+        if request.endpoint.split('.')[0] != get_role():
             abort(403)
         return route_func(*args, **kwargs)
 
@@ -32,7 +32,7 @@ def role_required(route_func):
 
 
 def check_role():
-    return True if current_user.get_role() == 'director' else False
+    return True if get_role() == 'director' else False
 
 
 def get_db():

@@ -1,9 +1,11 @@
+import dbase
 from flask_login import UserMixin
 
 
+
 class UserLogin(UserMixin):
-    def fromDB(self, user_id, db):
-        self.__user = db.getUser(user_id)
+    def fromDB(self, user_id):
+        self.__user = dbase.getUser(user_id)
         return self
 
     def create(self, user):
@@ -11,9 +13,10 @@ class UserLogin(UserMixin):
         return self
 
     def get_id(self):
-        return str(self.__user['id'])
+        return str(self.__user.id)
 
     def get_role(self):
+        # print(str(self.__user['role']))
         return str(self.__user['role'])
 
     def get_menu(self):

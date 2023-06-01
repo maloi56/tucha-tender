@@ -16,14 +16,14 @@
     <h2>
         Отправить документы отделу кадров
     </h2>
-    {% if hr_info['document'] != None %}
+    {% if hr_info.Rating.document != None %}
     <p>Файл загружен</p>
     {% else %}
     <p>Файл не загружен</p>
     {% endif %}
     <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
         {{ upload_form.hidden_tag() }}
-        {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
+        {{ upload_form.tender_id(value=tender.id, type="hidden") }}
         {{ upload_form.role(value="hr", type="hidden") }}
         <p>{{ upload_form.file()}}</p>
         <p>{{ upload_form.submit() }}</p>
@@ -33,14 +33,14 @@
     <h2>
         Отправить документы специалисту механизации
     </h2>
-    {% if instruments_info['document'] != None %}
+    {% if instruments_info.Rating.document != None %}
     <p>Файл загружен</p>
     {% else %}
     <p>Файл не загружен</p>
     {% endif %}
     <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
         {{ upload_form.hidden_tag() }}
-        {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
+        {{ upload_form.tender_id(value=tender.id, type="hidden") }}
         {{ upload_form.role(value="instruments", type="hidden") }}
         <p> {{ upload_form.file()}}</p>
         <p>{{ upload_form.submit() }}</p>
@@ -50,14 +50,14 @@
     <h2>
         Отправить документы специалисту материального учета
     </h2>
-    {% if materials_info['document'] != None %}
+    {% if materials_info.Rating.document != None %}
     <p>Файл загружен</p>
     {% else %}
     <p>Файл не загружен</p>
     {% endif %}
     <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
         {{ upload_form.hidden_tag() }}
-        {{ upload_form.tender_id(value=tender['id'], type="hidden") }}
+        {{ upload_form.tender_id(value=tender.id, type="hidden") }}
         {{ upload_form.role(value="materials", type="hidden") }}
         <p>{{ upload_form.file()}}</p>
         <p>{{ upload_form.submit() }}</p>

@@ -18,14 +18,14 @@ DATABASE = 'database.db'
 def role_required(route_func):
     @wraps(route_func)
     def wrapper(*args, **kwargs):
-        if request.endpoint.split('.')[0] != current_user.get_role():
+        if request.endpoint.split('.')[0] != get_role():
             abort(403)
         return route_func(*args, **kwargs)
     return wrapper
 
 
 def check_role():
-    return True if current_user.get_role() == 'instruments' else False
+    return True if get_role() == 'instruments' else False
 
 
 def get_db():
@@ -78,7 +78,7 @@ def tender(id):
     tender = dbase.get_tender(id)
     if not tender or not check_role():
         abort(404)
-    rate_info = dbase.get_tender_rate(id, current_user.get_role())
+    rate_info = dbase.get_tender_rate(id, get_role())
 
     download_form = DownloadDocsForm()
     download_form.tender_id.data = id
@@ -103,7 +103,7 @@ def rate_tender():
     tender = dbase.get_tender(form.tender_id.data)
     if not tender:
         abort(404)
-    role = current_user.get_role()
+    role = get_role()
     if form.validate_on_submit():
         res = dbase.rate_tender(role, tender['id'], form.costprice.data, form.comment.data, form.slider.data)
         print(res)
@@ -122,7 +122,7 @@ def rate_tender():
 def download_department_doc():
     form = DownloadDocsForm()
     if form.validate_on_submit():
-        role = current_user.get_role()
+        role = get_role()
         tender_id = form.tender_id.data
         doc = dbase.get_department_doc(tender_id, role)['document']
         if doc is not None:

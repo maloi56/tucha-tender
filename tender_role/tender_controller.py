@@ -12,6 +12,7 @@ from flask import render_template, url_for, redirect, flash, g, abort, request, 
 from flask_login import current_user
 from bs4 import BeautifulSoup
 from FDataBase import FDataBase
+import dbase
 
 from tender_role.forms import AddFilterForm, DeleteFilterForm, AddBanForm, DeleteBanForm, AddOptionalRulesForm, \
     SelectTenderForm, DeleteTenderForm, UploadDocForm, DownloadDocsForm
@@ -37,36 +38,6 @@ def role_required(route_func):
 
 def check_role():
     return True if current_user.get_role() == 'tender' else False
-
-
-def get_db():
-    db = sqlite3.connect(DATABASE, check_same_thread=False)
-    db.row_factory = sqlite3.Row
-    return db
-
-
-def get_database():
-    '''Соединение с БД, если оно еще не установлено'''
-    if not hasattr(g, 'link_db'):
-        g.link_db = get_db()
-    return g.link_db
-
-
-dbase = None
-
-
-def before_request():
-    """Установление соединения с БД перед выполнением запроса"""
-    global dbase
-    db = get_database()
-    dbase = FDataBase(db)
-
-
-def close_db(request):
-    '''Закрываем соединение с БД, если оно было установлено'''
-    if hasattr(g, 'link_db'):
-        g.link_db.close()
-
 
 def index():
     # dbase.init_db()
@@ -113,8 +84,8 @@ def selected():
 
 
 def rules():
-    rules = get_filter_words(dbase)
-    ban_rules = get_ban_words(dbase)
+    rules = get_filter_words()
+    ban_rules = get_ban_words()
     optional_rules = dbase.get_optional_rules()
 
     add_rule_form = AddFilterForm()
@@ -182,9 +153,15 @@ def remove_ban_word():
 
 
 def find_tenders():
-    if find_new_tenders(dbase):
+    if find_new_tenders():
         selected_items = dbase.get_considered('отбор')
-        return render_template('considered.html', title='Рассматриваемые заявки', selected_items=selected_items,
+        delete_form = DeleteTenderForm()
+        select_form = SelectTenderForm()
+        return render_template('tender/considered.html',
+                               title='Рассматриваемые заявки',
+                               selected_items=selected_items,
+                               delete_form=delete_form,
+                               select_form=select_form,
                                menu=current_user.get_menu() if current_user.is_authenticated else [])
     else:
         flash("Ошибка поиска", "error")
@@ -198,8 +175,9 @@ def tender_id(id):
         abort(404)
     upload_form = UploadDocForm()
     doc_form = DownloadDocsForm()
-    doc_form.doc_href.data = tender['id']
-    hr_info = dbase.get_tender_rate(id, 'login')
+    doc_form.doc_href.data = tender.id
+    hr_info = dbase.get_tender_rate(id, 'hr')
+    print(hr_info.Rating.document)
     instruments_info = dbase.get_tender_rate(id, 'instruments')
     materials_info = dbase.get_tender_rate(id, 'materials')
     return render_template('tender/tender.html',
@@ -246,7 +224,7 @@ def download_docs():
     else:
         url = f"https://zakupki.gov.ru/epz/order/notice/notice223/documents.html?noticeInfoId={id}"
         response = requests.get(url=url, headers=headers)
-        soup = BeautifulSoup(response.text, "html.lxml")
+        soup = BeautifulSoup(response.text, "lxml")
         pre_blocks = soup.find_all("div", class_="attachment__value")
         blocks = pre_blocks[3].find_all("span", class_="count")
         type = "223"
