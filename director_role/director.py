@@ -3,17 +3,8 @@ from flask import Blueprint, request, abort
 from flask_login import login_required, current_user
 
 import director_role.director_controller as controller
+
 director = Blueprint('director', __name__, template_folder='templates', static_folder='static')
-
-
-@director.before_request
-def before_request():
-    controller.before_request()
-
-
-@director.teardown_request
-def close_db(request):
-    controller.close_db(request)
 
 
 @director.route('/')

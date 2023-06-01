@@ -6,16 +6,6 @@ import materials_role.materials_controller as controller
 materials = Blueprint('materials', __name__, template_folder='templates', static_folder='static')
 
 
-@materials.before_request
-def before_request():
-    controller.before_request()
-
-
-@materials.teardown_request
-def close_db(request):
-    controller.close_db(request)
-
-
 @materials.route('/')
 @login_required
 @controller.role_required

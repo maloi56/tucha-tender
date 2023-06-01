@@ -123,14 +123,14 @@ async def gather_data(db):
         await asyncio.gather(*tasks)
 
 
-def find_new_tenders():  # надо будет подумать над логикой подсчета новых заявок. можно, чтобы функция инсерта возвращала кол-во
+def find_new_tenders():  # надо будет подумать над логикой подсчета новых заявок. можно, чтобы функция инсерта возвращала кол-во переделать с использованием множеств
     try:
         mail = Mail('tendertestingg@gmail.com', 'kusvcxkhioiffbgi')
         current_tenders_count = int(dbase.get_considered_count('отбор'))
         asyncio.run(gather_data(dbase))
         dbase.insert_tenders(res)
         tenders_count = len(res) - current_tenders_count
-        if tenders_count != 0 and scheduler.running:
+        if tenders_count > 0 and scheduler.running:
             msg = f'Найдено {tenders_count} новых заявок'
             mail.send_email("Поиск тендеров", 'beztfake@yandex.ru', msg)
         return True
@@ -146,7 +146,7 @@ scheduler = APScheduler()
 
 
 def start_scheduler():
-    @scheduler.task('interval', id='do_job_1', seconds=30, misfire_grace_time=900)
+    @scheduler.task('interval', id='do_job_1', hours=24, misfire_grace_time=900)
     def job1():
         with scheduler.app.app_context():
             find_new_tenders()

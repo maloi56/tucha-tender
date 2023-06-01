@@ -5,17 +5,6 @@ import hr_role.hr_controller as controller
 
 hr = Blueprint('hr', __name__, template_folder='templates', static_folder='static')
 
-
-@hr.before_request
-def before_request():
-    controller.before_request()
-
-
-@hr.teardown_request
-def close_db(request):
-    controller.close_db(request)
-
-
 @hr.route('/')
 @login_required
 @controller.role_required

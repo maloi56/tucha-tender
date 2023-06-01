@@ -6,9 +6,9 @@
 <p>{{ msg }}</p>
 {% endfor %}
 <div class="information">
-    <p>{{ tender['title'] }} </p>
-    <p>Начальная цена: {{ tender['price']|float_to_currency }}</p>
-    <p>Дата окончания подачи заявок: {{ tender['date'] }}</p>
+    <p>{{ tender.title }} </p>
+    <p>Начальная цена: {{ tender.price|float_to_currency }}</p>
+    <p>Дата окончания подачи заявок: {{ tender.date }}</p>
 </div>
 <div class="action">
     <form action="{{ url_for('.download_docs') }}" method="post">
@@ -36,21 +36,21 @@
             </form>
         </div>
         <h3>Оценки отдела кадров</h3>
-        <p><strong>Оценочная себестоимость:</strong> {{ hr_info['costprice'] }} </p>
-        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ hr_info['rate'] }} </p>
-        <p><strong>Комментарий:</strong> {{ hr_info['comment'] }} </p>
+        <p><strong>Оценочная себестоимость:</strong> {{ hr_info.Rating.costprice }} </p>
+        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ hr_info.Rating.rate }} </p>
+        <p><strong>Комментарий:</strong> {{ hr_info.Rating.comment }} </p>
     </div>
     <div class="information">
         <h3>Оценки отдела складского учета</h3>
-        <p><strong>Оценочная себестоимость:</strong> {{ materials_info['costprice'] }} </p>
-        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ materials_info['rate'] }} </p>
-        <p><strong>Комментарий:</strong> {{ materials_info['comment'] }} </p>
+        <p><strong>Оценочная себестоимость:</strong> {{ materials_info.Rating.costprice }} </p>
+        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ materials_info.Rating.rate }} </p>
+        <p><strong>Комментарий:</strong> {{ materials_info.Rating.comment }} </p>
     </div>
     <div class="information">
         <h3>Оценки отдела инструментов и механизации</h3>
-        <p><strong>Оценочная себестоимость:</strong> {{ instruments_info['costprice'] }} </p>
-        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ instruments_info['rate'] }} </p>
-        <p><strong>Комментарий:</strong> {{ instruments_info['comment'] }} </p>
+        <p><strong>Оценочная себестоимость:</strong> {{ instruments_info.Rating.costprice }} </p>
+        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ instruments_info.Rating.rate }} </p>
+        <p><strong>Комментарий:</strong> {{ instruments_info.Rating.comment }} </p>
     </div>
 </div>
 {% endblock %}

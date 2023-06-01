@@ -1,11 +1,10 @@
 import mimetypes
-import sqlite3
+import dbase
 import magic
 from functools import wraps
 from io import BytesIO
 from flask import render_template, url_for, redirect, flash, g, abort, send_file, request
 from flask_login import current_user
-from FDataBase import FDataBase
 from materials_role.forms import RateTenderForm, DownloadDocsForm
 
 headers = {
@@ -13,48 +12,19 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
 }
 
-DATABASE = 'database.db'
 
 def role_required(route_func):
     @wraps(route_func)
     def wrapper(*args, **kwargs):
-        if request.endpoint.split('.')[0] != get_role():
+        if request.endpoint.split('.')[0] != current_user.get_role():
             abort(403)
         return route_func(*args, **kwargs)
+
     return wrapper
 
 
 def check_role():
-    return True if get_role() == 'materials' else False
-
-
-def get_db():
-    db = sqlite3.connect(DATABASE, check_same_thread=False)
-    db.row_factory = sqlite3.Row
-    return db
-
-
-def get_database():
-    '''Соединение с БД, если оно еще не установлено'''
-    if not hasattr(g, 'link_db'):
-        g.link_db = get_db()
-    return g.link_db
-
-
-dbase = None
-
-
-def before_request():
-    """Установление соединения с БД перед выполнением запроса"""
-    global dbase
-    db = get_database()
-    dbase = FDataBase(db)
-
-
-def close_db(request):
-    '''Закрываем соединение с БД, если оно было установлено'''
-    if hasattr(g, 'link_db'):
-        g.link_db.close()
+    return True if current_user.get_role() == 'materials' else False
 
 
 def selected():
@@ -69,7 +39,6 @@ def selected():
 
 
 def index():
-    # dbase.init_db()
     return render_template('materials/index.html', title="Интеллектуальная поддержка отбора заявок на сайте закупок",
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
@@ -78,16 +47,15 @@ def tender(id):
     tender = dbase.get_tender(id)
     if not tender or not check_role():
         abort(404)
-    rate_info = dbase.get_tender_rate(id, get_role())
-
+    rate_info = dbase.get_tender_rate(id, current_user.get_role())
     download_form = DownloadDocsForm()
     download_form.tender_id.data = id
 
     rate_form = RateTenderForm()
     rate_form.tender_id.data = id
-    rate_form.costprice.data = rate_info['costprice']
-    rate_form.slider.data = rate_info['rate']
-    rate_form.comment.data = rate_info['comment']
+    rate_form.costprice.data = rate_info.Rating.costprice
+    rate_form.slider.data = rate_info.Rating.rate
+    rate_form.comment.data = rate_info.Rating.comment
 
     return render_template('materials/tender.html',
                            tender=tender,
@@ -103,9 +71,9 @@ def rate_tender():
     tender = dbase.get_tender(form.tender_id.data)
     if not tender:
         abort(404)
-    role = get_role()
+    role = current_user.get_role()
     if form.validate_on_submit():
-        res = dbase.rate_tender(role, tender['id'], form.costprice.data, form.comment.data, form.slider.data)
+        res = dbase.rate_tender(role, tender.id, form.costprice.data, form.comment.data, form.slider.data)
         print(res)
         if res:
             flash("Оценка отправлена", "success")
@@ -113,8 +81,8 @@ def rate_tender():
         else:
             flash("Ошибка при добавлении в БД", "error")
 
-    rate_info = dbase.get_tender_rate(tender['id'], role)
-    return render_template("materials/tender.html", title=f"Тендерная заявка номер: {tender['id']}",
+    rate_info = dbase.get_tender_rate(tender.id, role)
+    return render_template("materials/tender.html", title=f"Тендерная заявка номер: {tender.id}",
                            rate_info=rate_info, tender=tender,
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
@@ -122,9 +90,9 @@ def rate_tender():
 def download_department_doc():
     form = DownloadDocsForm()
     if form.validate_on_submit():
-        role = get_role()
+        role = current_user.get_role()
         tender_id = form.tender_id.data
-        doc = dbase.get_department_doc(tender_id, role)['document']
+        doc = dbase.get_department_doc(tender_id, role)
         if doc is not None:
             mime = magic.Magic(mime=True)
             content_type = mime.from_buffer(doc)

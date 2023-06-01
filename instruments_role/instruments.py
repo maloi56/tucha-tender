@@ -6,16 +6,6 @@ import instruments_role.instruments_controller as controller
 instruments = Blueprint('instruments', __name__, template_folder='templates', static_folder='static')
 
 
-@instruments.before_request
-def before_request():
-    controller.before_request()
-
-
-@instruments.teardown_request
-def close_db(request):
-    controller.close_db(request)
-
-
 @instruments.route('/')
 @login_required
 @controller.role_required

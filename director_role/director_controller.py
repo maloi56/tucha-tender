@@ -1,7 +1,7 @@
 import mimetypes
 import re
 from functools import wraps
-import sqlite3
+import dbase
 import tempfile
 import os
 import shutil
@@ -10,7 +10,6 @@ import requests
 from bs4 import BeautifulSoup
 from flask import render_template, url_for, redirect, request, flash, g, abort, send_file
 from flask_login import current_user
-from FDataBase import FDataBase
 from director_role.forms import DirectorDocsForm, DirectorStatusForm
 
 headers = {
@@ -18,13 +17,11 @@ headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
 }
 
-DATABASE = 'database.db'
-
 
 def role_required(route_func):
     @wraps(route_func)
     def wrapper(*args, **kwargs):
-        if request.endpoint.split('.')[0] != get_role():
+        if request.endpoint.split('.')[0] != current_user.get_role():
             abort(403)
         return route_func(*args, **kwargs)
 
@@ -32,36 +29,7 @@ def role_required(route_func):
 
 
 def check_role():
-    return True if get_role() == 'director' else False
-
-
-def get_db():
-    db = sqlite3.connect(DATABASE, check_same_thread=False)
-    db.row_factory = sqlite3.Row
-    return db
-
-
-def get_database():
-    '''Соединение с БД, если оно еще не установлено'''
-    if not hasattr(g, 'link_db'):
-        g.link_db = get_db()
-    return g.link_db
-
-
-dbase = None
-
-
-def before_request():
-    """Установление соединения с БД перед выполнением запроса"""
-    global dbase
-    db = get_database()
-    dbase = FDataBase(db)
-
-
-def close_db(request):
-    '''Закрываем соединение с БД, если оно было установлено'''
-    if hasattr(g, 'link_db'):
-        g.link_db.close()
+    return True if current_user.get_role() == 'director' else False
 
 
 def get_reasonability(rate):
@@ -77,16 +45,16 @@ def get_reasonability(rate):
 
 def get_self_price(hr, instruments, materials):
     try:
-        return hr['costprice'] + instruments['costprice'] + materials['costprice']
+        return hr.Rating.costprice + instruments.Rating.costprice + materials.Rating.costprice
     except Exception as err:
         print(err)
 
 
 def get_sppr_info(self_price, hr, instruments, materials, tender):
     try:
-        if (self_price != 0 and hr['rate'] != 0 and instruments['rate'] != 0 and materials['rate'] != 0):
-            average_rate = (hr['rate'] + instruments['rate'] + materials['rate']) / 3
-            reasonability = int((average_rate / 10) * (tender['price'] / (self_price + 1)) * 100)
+        if (self_price != 0 and hr.Rating.rate != 0 and instruments.Rating.rate != 0 and materials.Rating.rate != 0):
+            average_rate = (hr.Rating.rate + instruments.Rating.rate + materials.Rating.rate) / 3
+            reasonability = int((average_rate / 10) * (tender.price / (self_price + 1)) * 100)
             support_decision = get_reasonability(reasonability)
             return average_rate, str(reasonability) + '%', support_decision
         else:
@@ -171,10 +139,10 @@ def tender(id):
     if not tender or not check_role():
         abort(404)
     doc_form = DirectorDocsForm()
-    doc_form.doc_href.data = tender['id']
+    doc_form.doc_href.data = tender.id
 
     status_form = DirectorStatusForm()
-    status_form.doc_href.data = tender['id']
+    status_form.doc_href.data = tender.id
 
     hr_info = dbase.get_tender_rate(id, 'hr')
     instruments_info = dbase.get_tender_rate(id, 'instruments')

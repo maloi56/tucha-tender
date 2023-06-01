@@ -1,4 +1,3 @@
-import sqlite3
 import shutil
 import magic
 import mimetypes
@@ -11,7 +10,6 @@ from functools import wraps
 from flask import render_template, url_for, redirect, flash, g, abort, request, send_file
 from flask_login import current_user
 from bs4 import BeautifulSoup
-from FDataBase import FDataBase
 import dbase
 
 from tender_role.forms import AddFilterForm, DeleteFilterForm, AddBanForm, DeleteBanForm, AddOptionalRulesForm, \
