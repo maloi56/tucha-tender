@@ -1,6 +1,6 @@
 from flask import Blueprint, abort
 from flask_login import login_required, current_user
-import auth.login_controller as controller
+import app.auth.login_controller as controller
 
 auth = Blueprint('auth', __name__, template_folder='templates', static_folder='static')
 

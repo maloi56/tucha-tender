@@ -1,16 +1,16 @@
 import mimetypes
 import re
 from functools import wraps
-import dbase
+from app.util import dbase
 import tempfile
 import os
 import shutil
 import magic
 import requests
 from bs4 import BeautifulSoup
-from flask import render_template, url_for, redirect, request, flash, g, abort, send_file
+from flask import render_template, url_for, redirect, request, flash, abort, send_file
 from flask_login import current_user
-from director_role.forms import DirectorDocsForm, DirectorStatusForm
+from app.director_role.forms import DirectorDocsForm, DirectorStatusForm
 
 headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",

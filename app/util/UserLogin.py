@@ -1,6 +1,5 @@
-import dbase
+from app.util import dbase
 from flask_login import UserMixin
-
 
 
 class UserLogin(UserMixin):
@@ -16,7 +15,7 @@ class UserLogin(UserMixin):
         return str(self.__user.id)
 
     def get_role(self):
-        # print(str(self.__user['role']))
+        print(str(self.__user['role']))
         return str(self.__user['role'])
 
     def get_menu(self):

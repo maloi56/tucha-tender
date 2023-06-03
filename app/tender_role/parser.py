@@ -1,15 +1,14 @@
 import re
 import asyncio
 import aiohttp
-import dbase
+from app.util import dbase
 from datetime import datetime
 from bs4 import BeautifulSoup
 import pymorphy3
 from fuzzywuzzy import fuzz
 # from apscheduler.schedulers.background import BackgroundScheduler
 from flask_apscheduler import APScheduler
-from util.mail_sender import Mail
-from flask import current_app
+from app.util.mail_sender import Mail
 
 morph = pymorphy3.MorphAnalyzer()
 

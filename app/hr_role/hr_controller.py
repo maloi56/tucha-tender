@@ -1,17 +1,16 @@
 import mimetypes
-import dbase
+from app.util import dbase
 import magic
 from functools import wraps
 from io import BytesIO
-from flask import render_template, url_for, redirect, flash, g, abort, send_file, request
+from flask import render_template, url_for, redirect, flash, abort, send_file, request
 from flask_login import current_user
-from instruments_role.forms import RateTenderForm, DownloadDocsForm
+from app.hr_role.forms import RateTenderForm, DownloadDocsForm
 
 headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
 }
-
 
 
 def role_required(route_func):
@@ -20,19 +19,18 @@ def role_required(route_func):
         if request.endpoint.split('.')[0] != current_user.get_role():
             abort(403)
         return route_func(*args, **kwargs)
-
     return wrapper
 
 
 def check_role():
-    return True if current_user.get_role() == 'instruments' else False
+    return True if current_user.get_role() == 'hr' else False
 
 
 def selected():
     if check_role():
         print(current_user.get_menu())
         selected_items = dbase.get_selected('отбор')
-        return render_template('instruments/selected.html', selected_items=selected_items, title="Выбранные заявки",
+        return render_template('hr/selected.html', selected_items=selected_items, title="Выбранные заявки",
                                menu=current_user.get_menu() if current_user.is_authenticated else [])
     else:
         flash('Нет доступа')
@@ -40,7 +38,8 @@ def selected():
 
 
 def index():
-    return render_template('instruments/index.html', title="Интеллектуальная поддержка отбора заявок на сайте закупок",
+    # dbase.init_db()
+    return render_template('hr/index.html', title="Интеллектуальная поддержка отбора заявок на сайте закупок",
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
 
@@ -49,7 +48,6 @@ def tender(id):
     if not tender or not check_role():
         abort(404)
     rate_info = dbase.get_tender_rate(id, current_user.get_role())
-
     download_form = DownloadDocsForm()
     download_form.tender_id.data = id
 
@@ -59,7 +57,7 @@ def tender(id):
     rate_form.slider.data = rate_info.Rating.rate
     rate_form.comment.data = rate_info.Rating.comment
 
-    return render_template('instruments/tender.html',
+    return render_template('hr/tender.html',
                            tender=tender,
                            download_form=download_form,
                            rate_form=rate_form,
@@ -84,7 +82,7 @@ def rate_tender():
             flash("Ошибка при добавлении в БД", "error")
 
     rate_info = dbase.get_tender_rate(tender.id, role)
-    return render_template("instruments/tender.html", title=f"Тендерная заявка номер: {tender.id}",
+    return render_template("hr/tender.html", title=f"Тендерная заявка номер: {tender.id}",
                            rate_info=rate_info, tender=tender,
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 

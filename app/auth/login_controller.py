@@ -1,11 +1,11 @@
-import dbase
+from app.util import dbase
 
-from flask import render_template, redirect, flash, g, session, url_for
+from flask import render_template, redirect, flash, session, url_for
 from flask_login import login_user, current_user, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from UserLogin import UserLogin
-from auth.forms import RegisterForm, LoginForm
+from app.util.UserLogin import UserLogin
+from app.auth.forms import RegisterForm, LoginForm
 
 headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",

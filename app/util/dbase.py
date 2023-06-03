@@ -1,7 +1,7 @@
 import time
 import math
 
-from model import db, Selected, Roles, Users, FilterWords, BanWords, Rules, Rating
+from app.model import db, Selected, Roles, Users, FilterWords, BanWords, Rules, Rating
 from datetime import datetime
 
 from werkzeug.security import generate_password_hash

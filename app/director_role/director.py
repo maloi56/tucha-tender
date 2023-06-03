@@ -1,8 +1,7 @@
-from functools import wraps
-from flask import Blueprint, request, abort
-from flask_login import login_required, current_user
+from flask import Blueprint
+from flask_login import login_required
 
-import director_role.director_controller as controller
+import app.director_role.director_controller as controller
 
 director = Blueprint('director', __name__, template_folder='templates', static_folder='static')
 

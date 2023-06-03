@@ -1,7 +1,7 @@
 from flask import Blueprint
-from flask_login import login_required, current_user
+from flask_login import login_required
 
-import instruments_role.instruments_controller as controller
+import app.instruments_role.instruments_controller as controller
 
 instruments = Blueprint('instruments', __name__, template_folder='templates', static_folder='static')
 

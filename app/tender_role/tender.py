@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask_login import login_required
 
-import tender_role.tender_controller as controller
+import app.tender_role.tender_controller as controller
 
 tender = Blueprint('tender', __name__, template_folder='templates', static_folder='static')
 

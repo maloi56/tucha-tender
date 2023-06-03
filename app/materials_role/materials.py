@@ -1,7 +1,7 @@
 from flask import Blueprint
-from flask_login import login_required, current_user
+from flask_login import login_required
 
-import materials_role.materials_controller as controller
+import app.materials_role.materials_controller as controller
 
 materials = Blueprint('materials', __name__, template_folder='templates', static_folder='static')
 

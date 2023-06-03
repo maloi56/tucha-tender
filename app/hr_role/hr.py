@@ -1,7 +1,7 @@
 from flask import Blueprint
-from flask_login import login_required, current_user
+from flask_login import login_required
 
-import hr_role.hr_controller as controller
+import app.hr_role.hr_controller as controller
 
 hr = Blueprint('hr', __name__, template_folder='templates', static_folder='static')
 

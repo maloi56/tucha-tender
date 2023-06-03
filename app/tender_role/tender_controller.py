@@ -7,21 +7,19 @@ import requests
 import tempfile
 from functools import wraps
 
-from flask import render_template, url_for, redirect, flash, g, abort, request, send_file
+from flask import render_template, url_for, redirect, flash, abort, request, send_file
 from flask_login import current_user
 from bs4 import BeautifulSoup
-import dbase
+from app.util import dbase
 
-from tender_role.forms import AddFilterForm, DeleteFilterForm, AddBanForm, DeleteBanForm, AddOptionalRulesForm, \
+from app.tender_role.forms import AddFilterForm, DeleteFilterForm, AddBanForm, DeleteBanForm, AddOptionalRulesForm, \
     SelectTenderForm, DeleteTenderForm, UploadDocForm, DownloadDocsForm
-from tender_role.parser import find_new_tenders, get_filter_words, get_ban_words
+from app.tender_role.parser import find_new_tenders, get_filter_words, get_ban_words
 
 headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
 }
-
-DATABASE = 'database.db'
 
 
 def role_required(route_func):
@@ -36,6 +34,7 @@ def role_required(route_func):
 
 def check_role():
     return True if current_user.get_role() == 'tender' else False
+
 
 def index():
     # dbase.init_db()
