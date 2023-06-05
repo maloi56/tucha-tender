@@ -1,37 +1,58 @@
-{% extends 'tender/index.html' %}
+{% extends 'layout.html' %}
 
 {% block content %}
 {{ super() }}
 {% for cat, msg in get_flashed_messages(True) %}
 <div class="flash {{cat}}">{{msg}}</div>
 {% endfor %}
-  <body>
-    {% if selected_items %}
-      {% for item in selected_items %}
-        <div>
-          <div class="information">
-            <a href="https://zakupki.gov.ru{{ item['href'] }}">
-              Номер: {{ item['id'] }}
-            </a>
-          <p>Описание: {{ item['title'] }}</p>
-          <p>Начальная цена: {{ item['price']|float_to_currency }}</p>
-          <p>Дата окончания подачи заявок: {{ item['date'] }}</p>
-          </div>
-          <div class="action">
-          <form action="{{url_for('.delete') }}" method="post">
-            {{ delete_form.hidden_tag() }}
-            {{ delete_form.tender_id(value=item['id'], type="hidden") }}
-            {{ delete_form.submit(class="custom-btn btn-10") }}
-          </form>
-          <form action="{{ url_for('.select') }}" method="post">
-            {{ select_form.hidden_tag() }}
-            {{ select_form.tender_id(value=item['id'], type="hidden")}}
-            {{ select_form.submit(class="custom-btn btn-10") }}
-          </form>
-          </div>
+
+{% if selected_items %}
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="row justify-content-center">
+        {% for item in selected_items %}
+        <div class="col-md-8">
+            <div class="card border-dark mb-3">
+                <div class="card-header" style="font-size: 18px;">
+                    <a href="https://zakupki.gov.ru{{ item['href'] }}">
+                        Номер: {{ item['id'] }}
+                    </a>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Описание: {{ item['title'] }}</p>
+                    <p class="card-text">Начальная цена: {{ item['price']|float_to_currency }}</p>
+                    <p class="card-text">Дата окончания подачи заявок: {{ item['date'] }}</p>
+                    <div class="card-footer">
+                    <div class="d-flex justify-content-center" role="group">
+                        <div class="btn-group" role="group" style="margin-right: 10px;">
+                            <form action="{{url_for('.delete') }}" method="post">
+                                {{ delete_form.hidden_tag() }}
+                                {{ delete_form.tender_id(value=item['id'], type="hidden") }}
+                                <button type="submit" class="btn btn-primary btn-lg">Удалить</button>
+                            </form>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <form action="{{ url_for('.select') }}" method="post">
+                                {{ select_form.hidden_tag() }}
+                                {{ select_form.tender_id(value=item['id'], type="hidden")}}
+                                <button type="submit" class="btn btn-primary btn-lg">Выбрать</button>
+                            </form>
+                        </div>
+                    </div>
+                        </div>
+
+                </div>
+            </div>
         </div>
-      {% endfor %}
-    {% else %}
-      <p>No items selected</p>
-    {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <p>No items selected</p>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

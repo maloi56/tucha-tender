@@ -1,66 +1,88 @@
-{% extends 'tender/index.html' %}
+{% extends 'layout.html' %}
 
 {% block content %}
 {{ super() }}
 {% for cat, msg in get_flashed_messages(True) %}
-<p>{{ msg }}</p>
+<div class="alert alert-primary" role="alert">{{ msg }}</div>
 {% endfor %}
-<div class="action">
+<div style="margin-top: 20px;">
     <form action="{{ url_for('.download_docs') }}" method="post">
         {{ doc_form.hidden_tag() }}
         {{ doc_form.doc_href() }}
-        {{ doc_form.submit(class="custom-btn btn-10") }}
+        <div class="d-flex justify-content-center">
+            <button class="btn btn-primary btn-lg" type="submit" id="btn">Скачать документы</button>
+        </div>
     </form>
 </div>
-<div class="information">
-    <h2>
-        Отправить документы отделу кадров
-    </h2>
-    {% if hr_info.Rating.document != None %}
-    <p>Файл загружен</p>
-    {% else %}
-    <p>Файл не загружен</p>
-    {% endif %}
-    <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
-        {{ upload_form.hidden_tag() }}
-        {{ upload_form.tender_id(value=tender.id, type="hidden") }}
-        {{ upload_form.role(value="hr", type="hidden") }}
-        <p>{{ upload_form.file()}}</p>
-        <p>{{ upload_form.submit() }}</p>
-    </form>
-</div>
-<div class="information">
-    <h2>
-        Отправить документы специалисту механизации
-    </h2>
-    {% if instruments_info.Rating.document != None %}
-    <p>Файл загружен</p>
-    {% else %}
-    <p>Файл не загружен</p>
-    {% endif %}
-    <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
-        {{ upload_form.hidden_tag() }}
-        {{ upload_form.tender_id(value=tender.id, type="hidden") }}
-        {{ upload_form.role(value="instruments", type="hidden") }}
-        <p> {{ upload_form.file()}}</p>
-        <p>{{ upload_form.submit() }}</p>
-    </form>
-</div>
-<div class="information">
-    <h2>
-        Отправить документы специалисту материального учета
-    </h2>
-    {% if materials_info.Rating.document != None %}
-    <p>Файл загружен</p>
-    {% else %}
-    <p>Файл не загружен</p>
-    {% endif %}
-    <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
-        {{ upload_form.hidden_tag() }}
-        {{ upload_form.tender_id(value=tender.id, type="hidden") }}
-        {{ upload_form.role(value="materials", type="hidden") }}
-        <p>{{ upload_form.file()}}</p>
-        <p>{{ upload_form.submit() }}</p>
-    </form>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card w-70" style="margin-top: 20px; ">
+        <div class="container" style="margin-top: 20px;">
+            <div class="row">
+                <div class="card-body m-1 w-100" style="border: none;">
+                    <div>
+                        <h2>Отправить документы отделу кадров</h2>
+                        {% if hr_info.Rating.document %}
+                        <p>Файл загружен</p>
+                        {% else %}
+                        <p>Файл не загружен</p>
+                        {% endif %}
+                        <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
+                            {{ upload_form.hidden_tag() }}
+                            {{ upload_form.tender_id(value=tender.id, type="hidden") }}
+                            {{ upload_form.role(value="hr", type="hidden") }}
+                            <div class="input-group mb-3">
+                                {{ upload_form.file(class="form-control") }}
+                            </div>
+                            {{ upload_form.submit(class="btn btn-primary") }}
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card-body m-1 w-100" >
+                    <div>
+                        <h2>Отправить документы специалисту механизации</h2>
+                        {% if instruments_info.Rating.document %}
+                        <p>Файл загружен</p>
+                        {% else %}
+                        <p>Файл не загружен</p>
+                        {% endif %}
+                        <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
+                            {{ upload_form.hidden_tag() }}
+                            {{ upload_form.tender_id(value=tender.id, type="hidden") }}
+                            {{ upload_form.role(value="instruments", type="hidden") }}
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    {{ upload_form.file(class="form-control") }}
+                                </div>
+                            </div>
+                            {{ upload_form.submit(class="btn btn-primary") }}
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card-body m-1 w-100" style="border: none;">
+                    <div>
+                        <h2>Отправить документы специалисту материального учета</h2>
+                        {% if materials_info.Rating.document %}
+                        <p>Файл загружен</p>
+                        {% else %}
+                        <p>Файл не загружен</p>
+                        {% endif %}
+                        <form action="{{ url_for('.upload_doc') }}" method="post" enctype="multipart/form-data">
+                            {{ upload_form.hidden_tag() }}
+                            {{ upload_form.tender_id(value=tender.id, type="hidden") }}
+                            {{ upload_form.role(value="materials", type="hidden") }}
+                            <div class="form-group">
+                                <div class="input-group mb-3">
+                                    {{ upload_form.file(class="form-control") }}
+                                </div>
+                            </div>
+                            {{ upload_form.submit(class="btn btn-primary") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

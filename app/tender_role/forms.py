@@ -7,7 +7,7 @@ from wtforms.widgets import HiddenInput
 
 class AddFilterForm(FlaskForm):
     rule = StringField("Новый фильтр", validators=[DataRequired()])
-    submit = SubmitField("Добавить фильтр")
+    submit = SubmitField("Добавить новый фильтр")
 
 
 class DeleteFilterForm(FlaskForm):

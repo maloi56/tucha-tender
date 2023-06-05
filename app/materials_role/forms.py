@@ -8,9 +8,9 @@ class RateTenderForm(FlaskForm):
     tender_id = HiddenField(validators= [DataRequired()])
     costprice = IntegerField('Оценочная себестоимость',
                              validators=[InputRequired(message='Необходимо ввести оценочную себестоимость')])
-    slider = IntegerRangeField("Оценка целесообразности участия", validators=[
-        InputRequired(message='This field is required.'),
-        NumberRange(min=1, max=9, message='Value must be between 1 and 9.')])
+    select = SelectField(validators=[
+        InputRequired(message='This field is required.')],
+        choices=[('', 'Оценка целесообразности участия')] + [(str(i), str(i)) for i in range(1, 10)])
     comment = TextAreaField("Комментарий")
     submit = SubmitField("Оценить")
 

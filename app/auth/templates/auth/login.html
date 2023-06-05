@@ -1,28 +1,30 @@
-{% extends 'auth/index.html' %}
+{% extends 'layout.html' %}
 
 {% block content %}
 {{ super() }}
 {% for cat, msg in get_flashed_messages(True) %}
-<div class="flash {{cat}}">{{msg}}</div>
+<div class="alert alert-primary" role="alert">{{ msg }}</div>
 {% endfor %}
-<form action="{{url_for('.login')}}" method="post" class="information">
-    {{ form.hidden_tag() }}
-{% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] -%}
-	<p>{{ field.label() }}
-	{% if field.errors %}
-		{{ field(class="invalid") }}
-	<span class="invalid-feedback">
-		{% for e in field.errors %}
-		{{ e }}
-		{% endfor %}
-	</span>
-	{% else %}
-		{{ field() }}
-	{% endif %}
-{% endfor %}
-
-<p>{{ form.remember.label() }} {{ form.remember() }}
-<p>{{ form.submit() }}
-
-</form>
+<div class="d-flex justify-content-center align-items-center">
+    <form action="{{url_for('.login')}}" method="post" class="information">
+        {{ form.hidden_tag() }}
+        {% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] -%}
+        <div class="mb-3">
+			{{ field.label(class="form-label") }}
+            {% if field.errors %}
+            {{ field(class="form-control is-invalid") }}
+            {% else %}
+            {{ field(class="form-control") }}
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="mb-3 form-check">
+            {{ form.remember(class="form-check-input") }}
+			{{ form.remember.label(class="form-check-label") }}
+        </div>
+        <div class="mb-3">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
 {% endblock %}

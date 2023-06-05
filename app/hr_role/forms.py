@@ -1,20 +1,20 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, PasswordField, \
-    SelectField, DateField, HiddenField, IntegerField, IntegerRangeField, TextAreaField
+    SelectField, DateField, HiddenField, IntegerField, IntegerRangeField, TextAreaField, ValidationError
 from wtforms.validators import DataRequired, Length, EqualTo, InputRequired, Regexp, NumberRange
 
 
 class RateTenderForm(FlaskForm):
-    tender_id = HiddenField(validators= [DataRequired()])
+    tender_id = HiddenField(validators=[DataRequired()])
     costprice = IntegerField('Оценочная себестоимость',
                              validators=[InputRequired(message='Необходимо ввести оценочную себестоимость')])
-    slider = IntegerRangeField("Оценка целесообразности участия", validators=[
-        InputRequired(message='This field is required.'),
-        NumberRange(min=1, max=9, message='Value must be between 1 and 9.')])
+    select = SelectField(validators=[
+        InputRequired(message='This field is required.')],
+        choices=[('', 'Оценка целесообразности участия')] + [(str(i), str(i)) for i in range(1, 10)])
     comment = TextAreaField("Комментарий")
     submit = SubmitField("Оценить")
 
 
 class DownloadDocsForm(FlaskForm):
     tender_id = HiddenField(validators=[DataRequired()])
-    submit = SubmitField("Скачать документы")
+    submit = SubmitField("Скачать документ")

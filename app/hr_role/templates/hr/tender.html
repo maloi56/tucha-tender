@@ -1,52 +1,63 @@
-{% extends 'hr/index.html' %}
-
+{% extends 'layout.html' %}
 {% block content %}
 {{ super() }}
 {% for cat, msg in get_flashed_messages(True) %}
-<p>{{ msg }}</p>
+<div class="alert alert-primary" role="alert">{{ msg }}</div>
 {% endfor %}
-<div class="information">
-    <p>{{ tender['title'] }} </p>
-    <p>Начальная цена: {{ tender['price']|float_to_currency }}</p>
-    <p>Дата окончания подачи заявок: {{ tender['date'] }}</p>
-</div>
-<div class="action">
-    <form action="{{ url_for('.download_department_doc') }}" method="post">
-        {{ download_form.hidden_tag() }}
-        {{ download_form.tender_id() }}
-        {{ download_form.submit(class="custom-btn btn-10") }}
-    </form>
-</div>
-<div class="action">
-    <form action="{{ url_for('.rate_tender') }} " method="post">
-        <div class="information">
-            {{ rate_form.hidden_tag() }}
-            {{ rate_form.tender_id() }}
-            <p>{{ rate_form.costprice.label() }}</p>
-            <p>{{ rate_form.costprice(class='my-input')}}</p>
-            <div class="range-wrap">
-                <div class="range-slider">
-                    {{ rate_form.slider.label(class="label-range") }}
-                    {{ rate_form.slider(id="range1")}}
+<div class="d-flex flex-column">
+    <div class="card mb-3">
+        <div class="card-body">
+            <h3 class="card-title">{{ tender['title'] }}</h3>
+            <p class="card-text">Начальная цена: {{ tender['price']|float_to_currency }}</p>
+            <p class="card-text">Дата окончания подачи заявок: {{ tender['date'] }}</p>
+        </div>
+    </div>
+    <div class="form-group d-flex justify-content-center">
+        <div class="card mb-3" style="width: 1200px;">
+            <div class="card-body w-100">
+                <form action="{{ url_for('.download_department_doc') }}" method="post">
+                    {{ download_form.hidden_tag() }}
+                    {{ download_form.tender_id() }}
+                    <div class="d-flex justify-content-center">
+                        {{ download_form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+                <br>
+                <div class="form-group d-flex justify-content-center">
+                    <form action="{{ url_for('.rate_tender') }} " method="post">
+                        {{ rate_form.hidden_tag() }}
+                        {{ rate_form.tender_id() }}
+                        {{ rate_form.costprice.label()}}
+                        <div class="input-group mb-3" style="width: 800px;">
+                            <span class="input-group-text">₽</span>
+                            {{ rate_form.costprice(class='form-control', id='costprice') }}
+                        </div>
+                        {{ rate_form.select(class='form-select form-select-lg mb-3 custom-select') }}
+                        <br>
+                        {{ rate_form.comment.label()}}
+                        {{ rate_form.comment(class='form-control', rows=3, id='comment',placeholder='Напишите ваш комментарий') }}
+                        <br>
+                        <div class="d-flex justify-content-center">
+                            {% if tender['status'] == "на рассмотрении" %}
+                            {{ rate_form.submit(class="btn btn-primary") }}
+                            {% else %}
+                            {{ rate_form.submit(class="btn btn-primary", disabled = True) }}
+                            {% endif %}
+                        </div>
+                        {% for field in rate_form if field.name not in ['csrf_token', 'submit', 'doc_href'] %}
+                        {% if field.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for e in field.errors %}
+                            {{ e }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </form>
                 </div>
             </div>
-            <p>{{ rate_form.comment.label(class="label-range") }}</p>
-            <p>{{ rate_form.comment(rows=20, cols=100, style="font-size: 20px")}}</p>
-            {% if tender['status'] == "на рассмотрении"%}
-            <p>{{ rate_form.submit(class="custom-btn btn-10") }}</p>
-            {% else %}
-            <p>{{ rate_form.submit(class="custom-btn btn-10", disabled = True) }}</p>
-            {% endif %}
-            {% for field in rate_form if field.name not in ['csrf_token', 'submit', 'doc_href'] -%}
-            {% if field.errors %}
-            {{ field(class="invalid") }}
-            {% for e in field.errors %}
-            {{ e }}
-            {% endfor %}
-            {% endif %}
-            {% endfor %}
         </div>
-    </form>
+    </div>
 </div>
-<script src="{{ url_for('.static', filename='js/slider.js')}}"></script>
+
 {% endblock %}

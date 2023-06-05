@@ -249,7 +249,7 @@ def download_docs():
 
     # создаем zip-архив с содержимым временной папки
     zip_filename = f'Заявка - {id}.zip'
-    shutil.make_archive(zip_filename[:-4], 'zip', tempdir)
+    file = shutil.make_archive(zip_filename[:-4], 'zip', tempdir)
 
     # отправляем zip-архив клиенту в качестве ответа на запрос
-    return send_file(zip_filename, as_attachment=True)
+    return send_file(file, as_attachment=True)

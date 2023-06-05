@@ -1,34 +1,38 @@
-{% extends 'tender/index.html' %}
+{% extends 'layout.html' %}
 
 {% block content %}
 {{ super() }}
+<style>
+    a:hover {
+        opacity: 0.8;
+    }
+
+</style>
+
 {% for cat, msg in get_flashed_messages(True) %}
 <div class="flash {{cat}}">{{msg}}</div>
 {% endfor %}
-</head>
-<body>
-{% if selected_items %}
-{% for item in selected_items if item['status'] != "Удалено"%}
 <div>
-    <a href="{{ url_for('.tender_id', id=item.id) }}">
-        <style>
-          a:hover {
-            opacity: 0.8;
-          }
-
-
-        </style>
-        <div class="information">
-            <p> Номер: {{ item['id'] }} </p>
-            <p>Описание: {{ item['title'] }}</p>
-            <p>Начальная цена: {{ item['price']|float_to_currency }}</p>
-            <p>Дата окончания подачи заявок: {{ item['date'] }}</p>
-            <h2>Статус: {{ item['status'] }}</h2>
+    {% if selected_items %}
+    <div class="container" style="margin-top: 20px;">
+        <div class="row row-cols-2">
+            {% for item in selected_items if item['status'] != "Удалено" %}
+            <div class="col mb-4">
+                <div class="card border-dark w-100">
+                    <div class="card-header" style="font-size: 18px;">Номер: {{ item['id'] }}</div>
+                    <div class="card-body">
+                        <div class='card__title'>
+                            <h3 class="card-title">Статус: {{ item['status'] }}</h3>
+                            <p class="card-text" style="font-size: 20px;">{{ item['title'] }}</p>
+                        </div>
+                    </div>
+                    <a class="btn btn-primary w-100 stretched-link" href="{{ url_for('.tender_id', id=item.id) }}">Перейти</a>
+                </div>
+            </div>
+            {% endfor %}
         </div>
-    </a>
-</div>
-{% endfor %}
-{% else %}
-<p>No items selected</p>
-{% endif %}
+    </div>
+    {% else %}
+    <p>No items selected</p>
+    {% endif %}
 {% endblock %}

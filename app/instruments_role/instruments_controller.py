@@ -56,7 +56,7 @@ def tender(id):
     rate_form = RateTenderForm()
     rate_form.tender_id.data = id
     rate_form.costprice.data = rate_info.Rating.costprice
-    rate_form.slider.data = rate_info.Rating.rate
+    rate_form.select.data = rate_form.select.data = str(rate_info.Rating.rate) if rate_info.Rating.rate else ''
     rate_form.comment.data = rate_info.Rating.comment
 
     return render_template('instruments/tender.html',
@@ -75,7 +75,7 @@ def rate_tender():
         abort(404)
     role = current_user.get_role()
     if form.validate_on_submit():
-        res = dbase.rate_tender(role, tender.id, form.costprice.data, form.comment.data, form.slider.data)
+        res = dbase.rate_tender(role, tender.id, form.costprice.data, form.comment.data, form.select.data)
         print(res)
         if res:
             flash("Оценка отправлена", "success")

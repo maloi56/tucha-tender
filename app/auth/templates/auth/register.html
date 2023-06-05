@@ -1,27 +1,26 @@
-{% extends 'auth/index.html' %}
+{% extends 'layout.html' %}
 
 {% block content %}
 {{ super() }}
 {% for cat, msg in get_flashed_messages(True) %}
-<div class="flash {{cat}}">{{msg}}</div>
+<div class="alert alert-primary" role="alert">{{ msg }}</div>
 {% endfor %}
-<form action="{{ url_for('.register') }}" method="post">
-
-    {{ form.hidden_tag() }}
-    {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
-    <p>{{ field.label() }}
-        {% if field.errors %}
-        {{ field(class="invalid") }}
-        <span class="invalid-feedback">
-		{% for e in field.errors %}
-		{{ e }}
-		{% endfor %}
-	</span>
-        {% else %}
-        {{ field() }}
-        {% endif %}
+<div class="d-flex justify-content-center align-items-center">
+    <form action="{{ url_for('.register') }}" method="post" class="my-4">
+        {{ form.hidden_tag() }}
+        {% for field in form if field.name not in ['csrf_token', 'submit'] -%}
+        <div class="mb-3">
+            <label class="form-label">{{ field.label }}</label>
+            {% if field.errors %}
+            {{ field(class="form-control is-invalid") }}
+            {% else %}
+            {{ field(class="form-control") }}
+            {% endif %}
+        </div>
         {% endfor %}
-
-    <p>{{ form.submit() }}
-</form>
+        <div class="text-center">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
 {% endblock %}

@@ -1,24 +1,5 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>{{title}}</title>
-<!--    <link rel="stylesheet" type="text/css" href="../static/css/selected.css">-->
-    <link type="text/css" href="{{ url_for('.static', filename='css/selected.css')}}" rel="stylesheet" />
-  </head>
-  <body>
-  <div class='mask'>
-    <div class='loader'></div>
-</div>
-  {% block content -%}
-  {%- block mainmenu -%}
-    <h1>{{title}}</h1>
-    <div class="links">
-    {% for p in menu %}
-      <a href="{{ url_for(p.url) }}">{{p.title}}</a>
-    {% endfor %}
-    </div>
-  {% endblock mainmenu -%}
-  {% endblock -%}
-  <script src="{{ url_for('.static', filename='js/pre.js')}}"></script>
-  </body>
-</html>
+{% extends 'layout.html' %}
+
+{% block content %}
+{{ super() }}
+{% endblock %}

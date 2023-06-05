@@ -8,6 +8,7 @@ class base_config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY', '7e05aef5e3609333d0ac992767e26bfcf88cdd87')  # testing
     JSON_AS_ASCII = False
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://postgres:MASTERKEY@localhost/tender'
+    BOOTSTRAP_BOOTSWATCH_THEME = 'cosmo'
 
 
 class dev_config(base_config):

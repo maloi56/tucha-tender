@@ -1,18 +1,18 @@
 from flask import redirect, url_for
 from flask_login import LoginManager
 from flask_migrate import Migrate
-from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap5
 
 from app.util.UserLogin import UserLogin
 
 login_manager = LoginManager()
-login_manager.login_view = 'login'
+login_manager.login_view = 'auth.login'
 login_manager.login_message = "Авторизуйтесь для доступа к закрытым страницам"
 login_manager.login_message_category = "success"
 
 migrate = Migrate()
 
-bootstrap = Bootstrap()
+bootstrap = Bootstrap5()
 
 
 @login_manager.user_loader

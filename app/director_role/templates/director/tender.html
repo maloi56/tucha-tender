@@ -1,56 +1,96 @@
-{% extends 'director/index.html' %}
+{% extends 'layout.html' %}
 
 {% block content %}
 {{ super() }}
 {% for cat, msg in get_flashed_messages(True) %}
-<p>{{ msg }}</p>
+<div class="alert alert-primary" role="alert">{{ msg }}</div>
 {% endfor %}
-<div class="information">
-    <p>{{ tender.title }} </p>
-    <p>Начальная цена: {{ tender.price|float_to_currency }}</p>
-    <p>Дата окончания подачи заявок: {{ tender.date }}</p>
-</div>
-<div class="action">
-    <form action="{{ url_for('.download_docs') }}" method="post">
-        {{ doc_form.hidden_tag() }}
-        {{ doc_form.doc_href() }}
-        {{ doc_form.submit(class="custom-btn btn-10") }}
-    </form>
-</div>
-<div class="information">
-    <div class="information">
-        <div class='information'>
-            <h3>СППР</h3>
-            <p>Подсчитанная себестоимость: {{self_price}}</p>
-            <p>Средняя оценка отделов: {{average_rate}}</p>
-            <p>Целесообразность участия: {{reasonability}}</p>
-            <h2>Решение СППР: {{support_decision}}</h2>
-            <form action="{{ url_for('.set_status') }}" method="post">
-                <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
-                <div class='center'>
-                    {{ status_form.hidden_tag() }}
-                    {{ status_form.doc_href() }}
-                    {{ status_form.status(class="my-input") }}
-                    {{ status_form.submit(class="custom-btn btn-10") }}
-                </div>
-            </form>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="container" style="margin-top: 20px;">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h2 class="card-title">{{ tender.title }}</h2>
+                <p class="card-text">Начальная цена: {{ tender.price|float_to_currency }}</p>
+                <p class="card-text">Дата окончания подачи заявок: {{ tender.date }}</p>
+            </div>
         </div>
-        <h3>Оценки отдела кадров</h3>
-        <p><strong>Оценочная себестоимость:</strong> {{ hr_info.Rating.costprice }} </p>
-        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ hr_info.Rating.rate }} </p>
-        <p><strong>Комментарий:</strong> {{ hr_info.Rating.comment }} </p>
-    </div>
-    <div class="information">
-        <h3>Оценки отдела складского учета</h3>
-        <p><strong>Оценочная себестоимость:</strong> {{ materials_info.Rating.costprice }} </p>
-        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ materials_info.Rating.rate }} </p>
-        <p><strong>Комментарий:</strong> {{ materials_info.Rating.comment }} </p>
-    </div>
-    <div class="information">
-        <h3>Оценки отдела инструментов и механизации</h3>
-        <p><strong>Оценочная себестоимость:</strong> {{ instruments_info.Rating.costprice }} </p>
-        <p><strong>Оценка целесообразности участия в заявке:</strong> {{ instruments_info.Rating.rate }} </p>
-        <p><strong>Комментарий:</strong> {{ instruments_info.Rating.comment }} </p>
+        <div class="row">
+            <div class="col-lg-4 px-2 py-2">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Оценки отдела кадров</h3>
+                        <br>
+                        <p>Оценочная себестоимость: {{ hr_info.Rating.costprice }}</p>
+                        <p>Оценка целесообразности участия в заявке: {{ hr_info.Rating.rate }}</p>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#hr_com" aria-expanded="false" aria-controls="hr_com">
+                            Показать комментарий
+                        </button>
+                        <div class="collapse" id="hr_com">
+                            <div class="card card-body">
+                                {{ hr_info.Rating.comment }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 px-2 py-2">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Оценки отдела складского учета</h3>
+                        <p>Оценочная себестоимость: {{ materials_info.Rating.costprice }}</p>
+                        <p>Оценка целесообразности участия в заявке: {{ materials_info.Rating.rate }}</p>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#mat_com" aria-expanded="false" aria-controls="mat_com">
+                            Показать комментарий
+                        </button>
+                        <div class="collapse" id="mat_com">
+                            <div class="card card-body">
+                                {{ materials_info.Rating.comment }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 px-2 py-2">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Оценки отдела инструментов и механизации</h3>
+                        <p>Оценочная себестоимость: {{ instruments_info.Rating.costprice }}</p>
+                        <p>Оценка целесообразности участия в заявке: {{ instruments_info.Rating.rate }}</p>
+                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#ins_com" aria-expanded="false" aria-controls="ins_com">
+                            Показать комментарий
+                        </button>
+                        <div class="collapse" id="ins_com">
+                            <div class="card card-body">
+                                {{ instruments_info.Rating.comment }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h3 class="card-title">СППР</h3>
+                <p class="card-text">Подсчитанная себестоимость: {{ self_price }}</p>
+                <p class="card-text">Средняя оценка отделов: {{ average_rate }}</p>
+                <p class="card-text">Целесообразность участия: {{ reasonability }}</p>
+                <h2 class="card-title">Решение СППР: {{ support_decision }}</h2>
+                <form action="{{ url_for('.set_status') }}" method="post">
+                    <input type="hidden" name="tender_id" value="{{ tender['id'] }}">
+                    <div class="mb-3">
+                        {{ status_form.hidden_tag() }}
+                        {{ status_form.doc_href() }}
+                        {{ status_form.status(class="form-control") }}
+                    </div>
+                    <div class="d-grid">
+                        {{ status_form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
