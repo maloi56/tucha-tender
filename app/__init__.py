@@ -1,7 +1,11 @@
 import locale
+import os
+
 import requests
 
 from flask import Flask, redirect, url_for
+from werkzeug.security import generate_password_hash
+
 from app import config
 from app.extentions import login_manager, migrate, bootstrap
 from app.model import db
@@ -13,6 +17,15 @@ from app.instruments_role.instruments import instruments
 from app.materials_role.materials import materials
 from app.tender_role.tender import tender
 from app.tender_role.parser import scheduler, start_scheduler
+from app.util import dbase
+
+
+def initial_create():
+    hash = generate_password_hash(os.environ.get('ADMIN_PASS', 'admin'))
+    login = os.environ.get('ADMIN_LOGIN', 'admin')
+    print(login)
+    dbase.add_user('admin', login, hash)
+    dbase.insert_roles()
 
 
 def create_app(config=config.base_config):

@@ -9,6 +9,7 @@ from fuzzywuzzy import fuzz
 # from apscheduler.schedulers.background import BackgroundScheduler
 from flask_apscheduler import APScheduler
 from app.util.mail_sender import Mail
+from app.model import Selected
 
 morph = pymorphy3.MorphAnalyzer()
 
@@ -99,10 +100,10 @@ async def get_page_data(session, page, stopWords, filter, priceFrom, priceTo, fo
     print(f"[INFO] Обработал страницу {page}")
 
 
-async def gather_data(db):
+async def gather_data():
     async with aiohttp.ClientSession() as session:
         tasks = []
-        optRules = db.get_optional_rules()
+        optRules = dbase.get_optional_rules()
         if len(optRules) != 0:
             date = optRules[0].date
             formatted_date = date.strftime('%d.%m.%Y')
@@ -123,15 +124,18 @@ async def gather_data(db):
 
 
 def find_new_tenders():  # надо будет подумать над логикой подсчета новых заявок. можно, чтобы функция инсерта возвращала кол-во переделать с использованием множеств
+    print(scheduler.running)
     try:
         mail = Mail('tendertestingg@gmail.com', 'kusvcxkhioiffbgi')
-        current_tenders_count = int(dbase.get_considered_count('отбор'))
-        asyncio.run(gather_data(dbase))
+        tenders_count = 0
+        asyncio.run(gather_data())
+        for key, value in res.items():
+            if Selected.query.get(key) is None:
+                tenders_count += 1
         dbase.insert_tenders(res)
-        tenders_count = len(res) - current_tenders_count
         if tenders_count > 0 and scheduler.running:
             msg = f'Найдено {tenders_count} новых заявок'
-            mail.send_email("Поиск тендеров", 'beztfake@yandex.ru', msg)
+            mail.send_email("Поиск тендеров", 'Kolesnikovaksenia2001@gmail.com', msg)
         return True
     except Exception as e:
         print(e)

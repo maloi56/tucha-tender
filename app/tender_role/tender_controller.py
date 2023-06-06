@@ -3,11 +3,13 @@ import magic
 import mimetypes
 import re
 import os
+import io
 import requests
 import tempfile
+import zipfile
 from functools import wraps
 
-from flask import render_template, url_for, redirect, flash, abort, request, send_file
+from flask import render_template, url_for, redirect, flash, abort, request, send_file, after_this_request
 from flask_login import current_user
 from bs4 import BeautifulSoup
 from app.util import dbase
@@ -42,10 +44,10 @@ def index():
                            menu=current_user.get_menu() if current_user.is_authenticated else [])
 
 
-def considered():
+def considered(page):
     select_form = SelectTenderForm()
     delete_form = DeleteTenderForm()
-    selected_items = dbase.get_considered('отбор')
+    selected_items = dbase.get_considered(page)
     return render_template('tender/considered.html', title='Рассматриваемые заявки',
                            selected_items=selected_items,
                            select_form=select_form,
@@ -249,7 +251,19 @@ def download_docs():
 
     # создаем zip-архив с содержимым временной папки
     zip_filename = f'Заявка - {id}.zip'
-    file = shutil.make_archive(zip_filename[:-4], 'zip', tempdir)
+    temp_buffer = io.BytesIO()
+    with zipfile.ZipFile(temp_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for foldername, _, filenames in os.walk(tempdir):
+            for filename in filenames:
+                filepath = os.path.join(foldername, filename)
+                zipf.write(filepath, arcname=os.path.relpath(filepath, tempdir))
 
-    # отправляем zip-архив клиенту в качестве ответа на запрос
-    return send_file(file, as_attachment=True)
+    temp_buffer.seek(0)  # Перемещаем указатель буфера в начало
+
+    return send_file(
+        temp_buffer,
+        as_attachment=True,
+        download_name=zip_filename,
+        mimetype='application/zip',
+    )
+

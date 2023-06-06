@@ -22,23 +22,23 @@
                     <p class="card-text">Начальная цена: {{ item['price']|float_to_currency }}</p>
                     <p class="card-text">Дата окончания подачи заявок: {{ item['date'] }}</p>
                     <div class="card-footer">
-                    <div class="d-flex justify-content-center" role="group">
-                        <div class="btn-group" role="group" style="margin-right: 10px;">
-                            <form action="{{url_for('.delete') }}" method="post">
-                                {{ delete_form.hidden_tag() }}
-                                {{ delete_form.tender_id(value=item['id'], type="hidden") }}
-                                <button type="submit" class="btn btn-primary btn-lg">Удалить</button>
-                            </form>
-                        </div>
-                        <div class="btn-group" role="group">
-                            <form action="{{ url_for('.select') }}" method="post">
-                                {{ select_form.hidden_tag() }}
-                                {{ select_form.tender_id(value=item['id'], type="hidden")}}
-                                <button type="submit" class="btn btn-primary btn-lg">Выбрать</button>
-                            </form>
+                        <div class="d-flex justify-content-center" role="group">
+                            <div class="btn-group" role="group" style="margin-right: 10px;">
+                                <form action="{{url_for('.delete') }}" method="post">
+                                    {{ delete_form.hidden_tag() }}
+                                    {{ delete_form.tender_id(value=item['id'], type="hidden") }}
+                                    <button type="submit" class="btn btn-primary btn-lg">Удалить</button>
+                                </form>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <form action="{{ url_for('.select') }}" method="post">
+                                    {{ select_form.hidden_tag() }}
+                                    {{ select_form.tender_id(value=item['id'], type="hidden")}}
+                                    <button type="submit" class="btn btn-primary btn-lg">Выбрать</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                        </div>
 
                 </div>
             </div>
@@ -55,4 +55,20 @@
     </div>
 </div>
 {% endif %}
+
+<nav>
+    <ul class="pagination d-flex justify-content-center">
+        {% for page in selected_items.iter_pages() %}
+        {% if page %}
+        {% if page != selected_items.page %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('.considered', page=page) }}">{{ page }}</a></li>
+        {% else %}
+        <li class="page-item disabled"><a class="page-link">{{page}}</a></li>
+        {% endif %}
+        {% else %}
+        <span style="font-size: 2em;">…</span>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</nav>
 {% endblock %}

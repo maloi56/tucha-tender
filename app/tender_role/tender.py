@@ -13,11 +13,11 @@ def index():
     return controller.index()
 
 
-@tender.route('/considered')
+@tender.route('/considered/<int:page>')
 @login_required
 @controller.role_required
-def considered():
-    return controller.considered()
+def considered(page=1):
+    return controller.considered(page)
 
 
 @tender.route('/selected')

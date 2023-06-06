@@ -5,6 +5,15 @@
 {% for cat, msg in get_flashed_messages(True) %}
 <div class="alert alert-primary" role="alert">{{ msg }}</div>
 {% endfor %}
+<div style="margin-top: 20px;">
+    <form action="{{ url_for('.download_docs') }}" method="post">
+        {{ doc_form.hidden_tag() }}
+        {{ doc_form.doc_href() }}
+        <div class="d-flex justify-content-center">
+            {{doc_form.submit(class="btn btn-primary btn-lg")}}
+        </div>
+    </form>
+</div>
 <div class="d-flex justify-content-center align-items-center">
     <div class="container" style="margin-top: 20px;">
         <div class="card mb-4">
@@ -18,8 +27,7 @@
             <div class="col-lg-4 px-2 py-2">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <h3 class="card-title">Оценки отдела кадров</h3>
-                        <br>
+                        <h4 class="card-title">Оценки отдела кадров	&#8195;&#8195;&#8195;&#8195;&#8195;</h4>
                         <p>Оценочная себестоимость: {{ hr_info.Rating.costprice }}</p>
                         <p>Оценка целесообразности участия в заявке: {{ hr_info.Rating.rate }}</p>
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
@@ -37,7 +45,7 @@
             <div class="col-lg-4 px-2 py-2">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <h3 class="card-title">Оценки отдела складского учета</h3>
+                        <h4 class="card-title">Оценки отдела складского учета</h4>
                         <p>Оценочная себестоимость: {{ materials_info.Rating.costprice }}</p>
                         <p>Оценка целесообразности участия в заявке: {{ materials_info.Rating.rate }}</p>
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
@@ -55,7 +63,7 @@
             <div class="col-lg-4 px-2 py-2">
                 <div class="card mb-4">
                     <div class="card-body">
-                        <h3 class="card-title">Оценки отдела инструментов и механизации</h3>
+                        <h4 class="card-title">Оценки отдела инструментов и механизации</h4>
                         <p>Оценочная себестоимость: {{ instruments_info.Rating.costprice }}</p>
                         <p>Оценка целесообразности участия в заявке: {{ instruments_info.Rating.rate }}</p>
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse"

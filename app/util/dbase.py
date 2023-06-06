@@ -5,6 +5,7 @@ from app.model import db, Selected, Roles, Users, FilterWords, BanWords, Rules, 
 from datetime import datetime
 
 from werkzeug.security import generate_password_hash
+from app.config import POSTS_PER_PAGE
 
 
 def insert_tenders(res):
@@ -19,6 +20,22 @@ def insert_tenders(res):
     except Exception as e:
         db.session.rollback()
         print("Ошибка получения данных из БД: " + str(e))
+
+
+def insert_roles():
+    try:
+        roles = {1: 'admin',
+                 2: 'director',
+                 3: 'tender',
+                 4: 'hr',
+                 5: 'materials',
+                 6: 'instruments'}
+        for key, value in roles.items():
+            role = Roles(id=key, name=value)
+            db.session.add(role)
+        db.session.commit()
+    except Exception as e:
+        pass
 
 
 def get_department_doc(tender_id, role):  # ПОСМОТРЕТЬ ДЖОИНЫ
@@ -327,9 +344,9 @@ def get_considered_count(status):
         print("Ошибка получения данных из БД: " + str(e))
 
 
-def get_considered(status):
+def get_considered(page):
     try:
-        res = Selected.query.filter_by(status=status).all()
+        res = Selected.query.filter_by(status='отбор').paginate(page=page, per_page=POSTS_PER_PAGE, error_out=False)
         return res
     except Exception as e:
         db.session.rollback()

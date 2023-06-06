@@ -4,7 +4,8 @@ from functools import wraps
 from app.util import dbase
 import tempfile
 import os
-import shutil
+import io
+import zipfile
 import magic
 import requests
 from bs4 import BeautifulSoup
@@ -100,7 +101,7 @@ def download_docs():
     else:
         url = f"https://zakupki.gov.ru/epz/order/notice/notice223/documents.html?noticeInfoId={id}"
         response = requests.get(url=url, headers=headers)
-        soup = BeautifulSoup(response.text, "html.lxml")
+        soup = BeautifulSoup(response.text, "lxml")
         pre_blocks = soup.find_all("div", class_="attachment__value")
         blocks = pre_blocks[3].find_all("span", class_="count")
         type = "223"
@@ -128,10 +129,21 @@ def download_docs():
 
     # создаем zip-архив с содержимым временной папки
     zip_filename = f'Заявка - {id}.zip'
-    shutil.make_archive(zip_filename[:-4], 'zip', tempdir)
+    temp_buffer = io.BytesIO()
+    with zipfile.ZipFile(temp_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for foldername, _, filenames in os.walk(tempdir):
+            for filename in filenames:
+                filepath = os.path.join(foldername, filename)
+                zipf.write(filepath, arcname=os.path.relpath(filepath, tempdir))
 
-    # отправляем zip-архив клиенту в качестве ответа на запрос
-    return send_file(zip_filename, as_attachment=True)
+    temp_buffer.seek(0)  # Перемещаем указатель буфера в начало
+
+    return send_file(
+        temp_buffer,
+        as_attachment=True,
+        download_name=zip_filename,
+        mimetype='application/zip',
+    )
 
 
 def tender(id):

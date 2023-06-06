@@ -26,13 +26,13 @@
     <h1>{{title}}</h1>
     <ul class="nav nav-pills">
         {% for p in menu %}
-        {% if request.path == url_for(p.url) %}
+        {% if request.path == url_for(p.url, page=1)%}
         <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="{{url_for(p.url)}}">{{p.title}}</a>
+            <a class="nav-link active" aria-current="page" href="{{url_for(p.url, page=1)}}">{{p.title}}</a>
         </li>
         {% else %}
         <li class="nav-item">
-            <a class="nav-link" href="{{url_for(p.url)}}">{{p.title}}</a>
+            <a class="nav-link" href="{{url_for(p.url, page=1)}}">{{p.title}}</a>
         </li>
         {% endif %}
         {% endfor %}
