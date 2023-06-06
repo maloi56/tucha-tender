@@ -10,8 +10,6 @@ class base_config(object):
     """Default configuration options."""
     SITE_NAME = os.environ.get('APP_NAME', 'tenders')
     SECRET_KEY = os.environ.get('SECRET_KEY', 'secrets')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
-                                             'postgresql+psycopg2://postgres:MASTERKEY@localhost/tender')
     POSTGRES_HOST = os.environ.get('POSTGRES_HOST', 'localhost')
     POSTGRES_PORT = os.environ.get('POSTGRES_PORT', 5432)
     POSTGRES_USER = os.environ.get('POSTGRES_USER', 'postgres')
@@ -21,7 +19,7 @@ class base_config(object):
     ADMIN_LOGIN = os.environ.get('ADMIN_LOGIN', 'admin')
     ADMIN_PASS = os.environ.get('ADMIN_PASS', 'admin')
 
-    SQLALCHEMY_DATABASE_URI = 'postgresql://%s:%s@%s:%s/%s' % (
+    SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://%s:%s@%s:%s/%s' % (
         POSTGRES_USER,
         POSTGRES_PASS,
         POSTGRES_HOST,
