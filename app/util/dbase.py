@@ -42,7 +42,6 @@ def get_department_doc(tender_id, role):  # ПОСМОТРЕТЬ ДЖОИНЫ
     try:
         role_obj = Roles.query.filter_by(name=role).first()
         if not role_obj:
-            print("Роль не найдена")
             return False
 
         rating = Rating.query.filter_by(tender=tender_id, role=role_obj.id).first()
@@ -51,7 +50,7 @@ def get_department_doc(tender_id, role):  # ПОСМОТРЕТЬ ДЖОИНЫ
 
         return rating.document
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -71,7 +70,7 @@ def upload_doc(doc, role, tender_id):
         db.session.commit()
         return True
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -83,7 +82,7 @@ def get_tender_rate(tender_id, role):
             return False
         return rating
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -91,13 +90,12 @@ def set_status(tender_id, status):
     try:
         tender = Selected.query.get(tender_id)
         if not tender:
-            print("Тендер не найден")
             return False
 
         tender.status = status
         db.session.commit()
     except Exception as e:
-        print("Ошибка БД в статусе: " + str(e))
+        raise e
         return False
     return True
 
@@ -106,12 +104,10 @@ def rate_tender(role, tender_id, cost_price, comment, rate):
     try:
         role_obj = Roles.query.filter_by(name=role).first()
         if not role_obj:
-            print("Роль не найдена")
             return False
 
         rating = Rating.query.filter_by(tender=tender_id, role=role_obj.id).first()
         if not rating:
-            print("Рейтинг не найден")
             return False
 
         rating.rate = rate
@@ -120,7 +116,7 @@ def rate_tender(role, tender_id, cost_price, comment, rate):
 
         db.session.commit()
     except Exception as e:
-        print("Ошибка добавления пользователя в БД: " + str(e))
+        raise e
         return False
     return True
 
@@ -132,7 +128,7 @@ def get_tender(tender_id):
             return False
         return tender
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -140,11 +136,10 @@ def get_role(user_id):
     try:
         role = Roles.query.filter_by(id=user_id).first()
         if not role:
-            print("Роль не найдена")
             return False
         return role.name
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
     return False
 
@@ -153,11 +148,10 @@ def getUserByLogin(login):
     try:
         user = Users.query.filter_by(login=login).first()
         if not user:
-            print("Пользователь не найден")
             return False
         return user
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
     return False
 
@@ -176,7 +170,7 @@ def getUser(user_id):
 
         return {'id': user.id, 'role': role_name.name, 'login': user.login, 'psw': user.psw, 'time': user.time}
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
     return False
 
@@ -187,7 +181,7 @@ def delete_ban_word(word):
         db.session.commit()
         return True
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -198,7 +192,7 @@ def add_ban_rule(new_rule):
         db.session.commit()
         return True
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -208,7 +202,7 @@ def delete_filter_word(word):
         db.session.commit()
         return True
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -221,13 +215,11 @@ def add_optional_rule(priceFrom, priceTo, date):
         else:
             rule.priceFrom = priceFrom
             rule.priceTo = priceTo
-            print(type(date))
-            print(date)
             rule.date = date
         db.session.commit()
         return True
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -235,12 +227,10 @@ def add_user(role, login, hpsw):
     try:
         existing_user = Users.query.filter_by(login=login).first()
         if existing_user:
-            print("Пользователь с таким login уже существует")
             return False
 
         role_obj = Roles.query.filter_by(name=role).first()
         if not role_obj:
-            print("Роль не найдена")
             return False
 
         tm = math.floor(time.time())
@@ -248,7 +238,7 @@ def add_user(role, login, hpsw):
         db.session.add(user)
         db.session.commit()
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
         return False
     return True
 
@@ -261,7 +251,7 @@ def add_rule(new_rule):
         return True
     except Exception as e:
         db.session.rollback()
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
     return False
 
 
@@ -270,7 +260,7 @@ def get_optional_rules():
         res = Rules.query.all()
         return res
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def get_ban_words():
@@ -278,7 +268,7 @@ def get_ban_words():
         res = BanWords.query.all()
         return res
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def get_filter_words():
@@ -286,7 +276,7 @@ def get_filter_words():
         res = FilterWords.query.all()
         return res
     except Exception as e:
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def delete_tender(tender_id):
@@ -297,7 +287,7 @@ def delete_tender(tender_id):
             db.session.commit()
     except Exception as e:
         db.session.rollback()
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def select_tender(tender_id):
@@ -314,7 +304,7 @@ def select_tender(tender_id):
             db.session.commit()
     except Exception as e:
         db.session.rollback()
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def get_roles():
@@ -323,7 +313,7 @@ def get_roles():
         return res
     except Exception as e:
         db.session.rollback()
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def get_selected(status):
@@ -332,7 +322,7 @@ def get_selected(status):
         return res
     except Exception as e:
         db.session.rollback()
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def get_considered_count(status):
@@ -341,7 +331,7 @@ def get_considered_count(status):
         return res
     except Exception as e:
         db.session.rollback()
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def get_considered(page):
@@ -350,7 +340,7 @@ def get_considered(page):
         return res
     except Exception as e:
         db.session.rollback()
-        print("Ошибка получения данных из БД: " + str(e))
+        raise e
 
 
 def init_admin():

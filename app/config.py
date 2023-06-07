@@ -41,3 +41,4 @@ class test_config(base_config):
     """Testing configuration options."""
     TESTING = True
     WTF_CSRF_ENABLED = False
+    DEBUG = False

@@ -29,7 +29,6 @@ def check_role():
 
 def selected():
     if check_role():
-        print(current_user.get_menu())
         selected_items = dbase.get_selected('отбор')
         return render_template('materials/selected.html', selected_items=selected_items, title="Выбранные заявки",
                                menu=current_user.get_menu() if current_user.is_authenticated else [])
@@ -74,7 +73,6 @@ def rate_tender():
     role = current_user.get_role()
     if form.validate_on_submit():
         res = dbase.rate_tender(role, tender.id, form.costprice.data, form.comment.data, form.select.data)
-        print(res)
         if res:
             flash("Оценка отправлена", "success")
             return redirect(url_for('.selected'))

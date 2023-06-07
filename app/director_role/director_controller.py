@@ -48,7 +48,7 @@ def get_self_price(hr, instruments, materials):
     try:
         return hr.Rating.costprice + instruments.Rating.costprice + materials.Rating.costprice
     except Exception as err:
-        print(err)
+        raise err
 
 
 def get_sppr_info(self_price, hr, instruments, materials, tender):
@@ -73,7 +73,6 @@ def set_status():
 
 def selected():
     if check_role():
-        print(current_user.get_menu())
         selected_items = dbase.get_selected('отбор')
         return render_template('director/selected.html', selected_items=selected_items, title="Выбранные заявки",
                                menu=current_user.get_menu() if current_user.is_authenticated else [])

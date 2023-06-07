@@ -60,7 +60,7 @@ def select():
     if select_form.validate_on_submit():
         item_id = select_form.tender_id.data
         dbase.select_tender(item_id)
-        return redirect(url_for('.considered'))
+        return redirect(url_for('.considered', page=1))
     else:
         abort(404)
 
@@ -70,7 +70,7 @@ def delete():
     if delete_form.validate_on_submit():
         item_id = delete_form.tender_id.data
         dbase.delete_tender(item_id)
-        return redirect(url_for('.considered'))
+        return redirect(url_for('.considered', page=1))
     else:
         abort(404)
 
@@ -170,13 +170,11 @@ def find_tenders():
 def tender_id(id):
     tender = dbase.get_tender(id)
     if not tender or not check_role():
-        print(check_role())
         abort(404)
     upload_form = UploadDocForm()
     doc_form = DownloadDocsForm()
     doc_form.doc_href.data = tender.id
     hr_info = dbase.get_tender_rate(id, 'hr')
-    print(hr_info.Rating.document)
     instruments_info = dbase.get_tender_rate(id, 'instruments')
     materials_info = dbase.get_tender_rate(id, 'materials')
     return render_template('tender/tender.html',

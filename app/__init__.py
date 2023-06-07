@@ -23,7 +23,6 @@ from app.util import dbase
 def initial_create():
     hash = generate_password_hash(os.environ.get('ADMIN_PASS', 'admin'))
     login = os.environ.get('ADMIN_LOGIN', 'admin')
-    print(login)
     dbase.add_user('admin', login, hash)
     dbase.insert_roles()
 
@@ -60,7 +59,7 @@ def register_blueprints(app):
 
 
 def float_to_currency(value):
-    locale.setlocale(locale.LC_ALL, '')  # Устанавливаем локаль по умолчанию
+    locale.setlocale(locale.LC_ALL, ('ru_RU', 'UTF-8'))  # Устанавливаем локаль по умолчанию
     return locale.currency(value, grouping=True, symbol=True)
 
 

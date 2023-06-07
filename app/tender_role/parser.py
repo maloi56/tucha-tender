@@ -59,8 +59,6 @@ async def get_page_data(session, page, stopWords, filter, priceFrom, priceTo, fo
                 block = ci.find("div", {"class": "data-block__title"}, text="Окончание подачи заявок")
                 if block:
                     date_value = block.find_next_sibling("div", {"class": "data-block__value"}).text
-                else:
-                    print("No date found")
                 price_value = 0 if price is None else int(re.sub(r'\D', '', price.text.strip())) / 100
             href = ci.find_all("a")
             if len(card_data) != 0:
@@ -124,9 +122,8 @@ async def gather_data():
 
 
 def find_new_tenders():  # надо будет подумать над логикой подсчета новых заявок. можно, чтобы функция инсерта возвращала кол-во переделать с использованием множеств
-    print(scheduler.running)
     try:
-        mail = Mail('tendertestingg@gmail.com', 'kusvcxkhioiffbgi')
+        mail = Mail('Kolesnikovaksenia2001@gmail.com', 'kusvcxkhioiffbgi')
         tenders_count = 0
         asyncio.run(gather_data())
         for key, value in res.items():
@@ -138,7 +135,7 @@ def find_new_tenders():  # надо будет подумать над логи�
             mail.send_email("Поиск тендеров", 'Kolesnikovaksenia2001@gmail.com', msg)
         return True
     except Exception as e:
-        print(e)
+        raise e
         return False
 
 

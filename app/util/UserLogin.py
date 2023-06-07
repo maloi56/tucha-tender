@@ -15,7 +15,6 @@ class UserLogin(UserMixin):
         return str(self.__user.id)
 
     def get_role(self):
-        print(str(self.__user['role']))
         return str(self.__user['role'])
 
     def get_menu(self):
