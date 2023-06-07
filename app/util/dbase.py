@@ -334,7 +334,7 @@ def get_considered_count(status):
         raise e
 
 
-def get_considered(page):
+def get_considered(page=1):
     try:
         res = Selected.query.filter_by(status='отбор').paginate(page=page, per_page=POSTS_PER_PAGE, error_out=False)
         return res

@@ -153,7 +153,7 @@ def remove_ban_word():
 
 def find_tenders():
     if find_new_tenders():
-        selected_items = dbase.get_considered('отбор')
+        selected_items = dbase.get_considered()
         delete_form = DeleteTenderForm()
         select_form = SelectTenderForm()
         return render_template('tender/considered.html',

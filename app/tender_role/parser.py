@@ -123,7 +123,7 @@ async def gather_data():
 
 def find_new_tenders():  # надо будет подумать над логикой подсчета новых заявок. можно, чтобы функция инсерта возвращала кол-во переделать с использованием множеств
     try:
-        mail = Mail('Kolesnikovaksenia2001@gmail.com', 'kusvcxkhioiffbgi')
+        mail = Mail('tendertestingg@gmail.com', 'kusvcxkhioiffbgi')
         tenders_count = 0
         asyncio.run(gather_data())
         for key, value in res.items():
