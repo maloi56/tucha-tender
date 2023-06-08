@@ -19,16 +19,16 @@ class UserLogin(UserMixin):
 
     def get_menu(self):
         if self.get_role() == 'tender':
-            return [{'title': 'Главная', 'url': '.index'},
-                    {'title': 'Рассматриваемые', 'url': '.considered'},
-                    {'title': 'Отобранные', 'url': '.selected'},
-                    {'title': 'База правил', 'url': '.rules'},
-                    {'title': 'Выход', 'url': 'auth.logout'}
+            return [{'title': 'Главная', 'url': '.index', 'page': None},
+                    {'title': 'Рассматриваемые', 'url': '.considered', 'page': 1},
+                    {'title': 'Отобранные', 'url': '.selected', 'page': None},
+                    {'title': 'База правил', 'url': '.rules', 'page': None},
+                    {'title': 'Выход', 'url': 'auth.logout', 'page': None}
                     ]
         elif self.get_role() == 'admin':
             return [{'title': 'Выход', 'url': 'auth.logout'}]
 
         else:
-            return [{'title': 'Главная', 'url': '.index'},
-                    {'title': 'Отобранные', 'url': '.selected'},
-                    {'title': 'Выход', 'url': 'auth.logout'}]
+            return [{'title': 'Главная', 'url': '.index', 'page': None},
+                    {'title': 'Отобранные', 'url': '.selected', 'page': None},
+                    {'title': 'Выход', 'url': 'auth.logout', 'page': None}]
