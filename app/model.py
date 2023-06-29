@@ -35,7 +35,7 @@ class Users(db.Model):
     login = db.Column(db.TEXT, nullable=False)
     psw = db.Column(db.TEXT, nullable=False)
     time = db.Column(db.INTEGER, nullable=False)
-    # Определите внешний ключ (если необходимо)
+    tg_id = db.Column(db.INTEGER)
     role_fk = db.ForeignKey('roles.id')
 
 

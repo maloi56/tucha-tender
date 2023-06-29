@@ -56,19 +56,21 @@
 </div>
 {% endif %}
 
-<nav>
-    <ul class="pagination d-flex justify-content-center">
-        {% for page in selected_items.iter_pages() %}
-        {% if page %}
-        {% if page != selected_items.page %}
-        <li class="page-item"><a class="page-link" href="{{ url_for('.considered', page=page) }}">{{ page }}</a></li>
-        {% else %}
-        <li class="page-item disabled"><a class="page-link">{{page}}</a></li>
-        {% endif %}
-        {% else %}
-        <span style="font-size: 2em;">…</span>
-        {% endif %}
-        {% endfor %}
-    </ul>
-</nav>
+
+<ul class="pagination d-flex justify-content-center">
+    {% for page in selected_items.iter_pages() %}
+    {% if page %}
+    {% if page != selected_items.page %}
+    <li class="page-item"><a class="page-link" href="{{ url_for('.considered', page=page) }}">{{ page }}</a></li>
+    {% else %}
+    <li class="page-item active" aria-current="page">
+        <a class="page-link">{{page}}</a>
+    </li>
+    {% endif %}
+    {% else %}
+    <span style="font-size: 2em;">…</span>
+    {% endif %}
+    {% endfor %}
+</ul>
+
 {% endblock %}

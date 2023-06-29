@@ -10,6 +10,7 @@ from fuzzywuzzy import fuzz
 from flask_apscheduler import APScheduler
 from app.util.mail_sender import Mail
 from app.model import Selected
+from botApp.create_bot import bot
 
 morph = pymorphy3.MorphAnalyzer()
 
@@ -87,14 +88,14 @@ async def get_page_data(session, page, stopWords, filter, priceFrom, priceTo, fo
                                         "date": datetime.strptime(date_value, '%d.%m.%Y'),
                                         "href": href[2].get("href")
                                     }
-                                    print(fil_word + " " + word)
-                                    print(res[id])
+                                    # print(fil_word + " " + word)
+                                    # print(res[id])
                                     flag_1 = True
                                     break
                         if flag_1:
                             break
-                else:
-                    print("В бан - " + card_data[0].text)
+                # else:
+                    # print("В бан - " + card_data[0].text)
     print(f"[INFO] Обработал страницу {page}")
 
 
@@ -121,22 +122,31 @@ async def gather_data():
         await asyncio.gather(*tasks)
 
 
-def find_new_tenders():  # надо будет подумать над логикой подсчета новых заявок. можно, чтобы функция инсерта возвращала кол-во переделать с использованием множеств
+def find_new_tenders():
+    if asyncio.run(async_find_new_tenders()):
+        return True
+    else:
+        return False
+
+
+async def async_find_new_tenders():  # надо будет подумать над логикой подсчета новых заявок. можно, чтобы функция инсерта возвращала кол-во переделать с использованием множеств
     try:
-        mail = Mail('tendertestingg@gmail.com', 'kusvcxkhioiffbgi')
+        # mail = Mail('tendertestingg@gmail.com', 'kusvcxkhioiffbgi')
         tenders_count = 0
-        asyncio.run(gather_data())
+        await gather_data()
         for key, value in res.items():
             if Selected.query.get(key) is None:
                 tenders_count += 1
         dbase.insert_tenders(res)
         if tenders_count > 0 and scheduler.running:
             msg = f'Найдено {tenders_count} новых заявок'
-            mail.send_email("Поиск тендеров", 'Kolesnikovaksenia2001@gmail.com', msg)
+            # mail.send_email("Поиск тендеров", 'Kolesnikovaksenia2001@gmail.com', msg)
+            for tg_id in dbase.get_tg_ids():
+                await bot.send_message(chat_id=tg_id, text=msg)
         return True
     except Exception as e:
+        print(e)
         raise e
-        return False
 
 
 scheduler = APScheduler()

@@ -346,3 +346,28 @@ def get_considered(page=1):
 def init_admin():
     hash = generate_password_hash('admin')
     add_user('admin', 'admin', hash)
+
+
+def check_tg_auth(tg_id):
+    return Users.query.filter_by(tg_id=tg_id).count()
+
+
+def tg_login(login, tg_id):
+    users = Users.query.filter_by(tg_id=tg_id).all()
+    for user in users:
+        if user.login != login:
+            user.tg_id = None
+    user = Users.query.filter_by(login=login).one()
+    user.tg_id = tg_id
+    db.session.commit()
+
+
+def tg_logout(tg_id):
+    user = Users.query.filter_by(tg_id=tg_id).one()
+    user.tg_id = None
+    db.session.commit()
+
+
+def get_tg_ids():
+    res = Users.query.filter(Users.tg_id != None).all()
+    return [user.tg_id for user in res]
